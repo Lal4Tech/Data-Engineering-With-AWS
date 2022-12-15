@@ -34,7 +34,7 @@ A data warehouse is designed to optimize data analysis processes and gathers dat
 - Batch Updating(Transform): A data warehouse retrieves and consolidates data periodically.
 - Dimensional Model(Load): is optimized for analytical query performance.
 ![DW Design](images/3-DW_ETL_Design.png)
-*DW Design*
+| *DW Design* |
 
 #### Technical Perspective
 Extract the data from the source systems used for operations, transform the data, and load it into a dimensional model.
