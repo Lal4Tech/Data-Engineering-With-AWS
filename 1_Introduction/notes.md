@@ -11,6 +11,11 @@ By the end of the course, you'll gain experience in a wide range of skills, incl
 
 ![Data warehouse representation](images/1-introduction-to-cloud-data-warehouses.jpg)
 
+<p>
+    <img src="images/1-introduction-to-cloud-data-warehouses.jpg" alt="Data warehouse representation" width=50% height=50%>
+    <em>Data warehouse representation</em>
+</p>
+
 
 ### Operational vs Analytical Business Processes
 **Operational processes**: Make it work.
