@@ -11,7 +11,6 @@ By the end of the course, you'll gain experience in a wide range of skills, incl
 
 <figure>
   <img src="images/1-introduction-to-cloud-data-warehouses.jpg" alt="Data warehouse representation" width=60% height=60%>
-  <figcaption>Data warehouse representation</figcaption>
 </figure>
 
 ### Operational vs Analytical Business Processes
@@ -30,24 +29,43 @@ By the end of the course, you'll gain experience in a wide range of skills, incl
 
 <figure>
   <img src="images/2-introduction-to-datawarehousing.png" alt="OLTP and OLAP" width=60% height=60%>
-  <figcaption style="text-align: center;">OLTP and OLAP</figcaption>
 </figure>
 
 A data warehouse is designed to optimize data analysis processes and gathers data from multiple sources.
 
 ### Data Warehouse Architecture
-#### Data Warehouse Design
-- Copy Data(Extract): Copy data from OLTP sources into Data warehouse: optimize the data for query and analysis.
-- Batch Updating(Transform): A data warehouse retrieves and consolidates data periodically.
-- Dimensional Model(Load): is optimized for analytical query performance.
-![DW Design](images/3-DW_ETL_Design.png)
-| *DW Design* |
+#### Data Warehouse Design(ETL)
+**Extracting**:
+    - Transfer data to the warehouse
+
+**Transforming**:
+    - Integrates many sources together
+    - Possibly cleansing: inconsistencies, duplication, missing values, etc..
+    - Possibly producing diagnostic metadata
+
+**Loading**:
+    - Structuring and loading the data into the dimensional data model
+
+
+<figure>
+  <img src="images/3-DW_ETL_Design.png" alt="DW Design" width=60% height=60%>
+</figure>
 
 #### Technical Perspective
 Extract the data from the source systems used for operations, transform the data, and load it into a dimensional model.
 
-![Kimball's Bus Architecture](images/4-Kimballs_Bus_Architecture.png)
+<figure>
+  <img src="images/4-Kimballs_Bus_Architecture.png" alt="Kimball's Bus Architecture" width=60% height=60%>
+</figure>
+Characteristics of Kimball Bus Architecture
+- Results in a common dimension data model shared by different departments.
+- Data is not kept at the aggregated level, but rather at the atomic level.
+- Organized by business processes, and used by different departments.
 
+
+<figure>
+  <img src="images/5-DWH_Tech_Perspective.png" alt="DWH Tech perspective" width=60% height=60%>
+</figure>
 
 
 
