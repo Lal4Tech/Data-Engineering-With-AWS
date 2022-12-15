@@ -9,19 +9,10 @@ By the end of the course, you'll gain experience in a wide range of skills, incl
 
 ## Introduction To Data Warehouses
 
-![Data warehouse representation](images/1-introduction-to-cloud-data-warehouses.jpg)
-
-<p>
-    <img src="images/1-introduction-to-cloud-data-warehouses.jpg" alt="Data warehouse representation" width=50% height=50%>
-    <em>Data warehouse representation</em>
-</p>
-
 <figure>
-  <img src="images/1-introduction-to-cloud-data-warehouses.jpg" alt="Data warehouse representation" width=75% height=75%>
+  <img src="images/1-introduction-to-cloud-data-warehouses.jpg" alt="Data warehouse representation" width=60% height=60%>
   <figcaption>Data warehouse representation</figcaption>
 </figure>
-
-
 
 ### Operational vs Analytical Business Processes
 **Operational processes**: Make it work.
@@ -36,6 +27,11 @@ By the end of the course, you'll gain experience in a wide range of skills, incl
 
 
 ![OLTP and OLAP](images/2-introduction-to-datawarehousing.png)
+
+<figure>
+  <img src="images/2-introduction-to-datawarehousing.png" alt="OLTP and OLAP" width=60% height=60%>
+  <figcaption style="text-align: center;">OLTP and OLAP</figcaption>
+</figure>
 
 A data warehouse is designed to optimize data analysis processes and gathers data from multiple sources.
 
