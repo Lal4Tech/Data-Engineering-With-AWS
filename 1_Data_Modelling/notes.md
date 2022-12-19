@@ -1,0 +1,169 @@
+# Introduction to Data Modelling
+**Databases**: A [database](https://en.wikipedia.org/wiki/Database) is a structured repository or collection of data that is stored and retrieved electronically for use in applications. Data can be stored, updated, or deleted from a database.
+
+**Database Management System (DBMS)**: The software used to access the database by the user and application is the database management system. Check out these few links describing a DBMS in more detail.
+- [Introduction to DBMS](https://www.geeksforgeeks.org/database-management-system-introduction-set-1/)
+- [DBMS as per Wikipedia](https://en.wikipedia.org/wiki/Database#Database_management_system)
+
+
+## What is a Data Model**
+> ...an abstraction that organizes elements of data and how they will relate to each other
+
+So,
+> Data modelling is the processing of creating data models for an information system.
+
+The process of data modelling is to organize data into a database system to ensure that your data is persisted and easily usable by users in your organization. 
+
+It's a process to support business and user applications.
+
+Steps:
+1. Gather Requirements: 
+   - From application team, business users and end users to understand that what data must be retained and served as a business or the end-users. 
+   - First we need to map out that how our data must be stored and persisted and how that data will related to each other.
+2. Conceptual Data Modelling
+   - Entity mapping by hand or by using some tools.
+3. Logical Data Modelling
+   - Here conceptual data models are mapped to logical models using tales, schemas and columns.
+4. Physical Data Modelling
+   -  Transform the logical data model to the DDL(Data Definition Language) to ale to create databases, tables and schemas.
+
+Common questions:
+- Why can't everything be stored in a giant excel spreadsheet:
+  - Limitations to the amount of data that can be stored.
+  - Read/write operations on a large scale is not possible
+- Does data modeling happen before you create a database, or is it an iterative process?
+  - Iterative process.
+  - Have to continually reorganize, restructure and optimize data models as per the business needs.
+
+## Why Data Model is important**
+- **Data Organization**: Organized data determine later data usage. 
+- **Use Cases**: A well thought out data model enables straightforward and simple queries. 
+- **Starting early**: Begin prior to building out application, business logic and analytical models.
+- **iterative process**: It's an iterative process as new requirements and new daa are introduced.
+
+## Who does Data Modelling
+Data modelling is an import skill for anyone involved in the process of using and analyzing data. including:
+- Data Engineers
+- Data Scientists
+- Software Engineers
+- Product Owners
+- Business Users
+
+## Introduction to Relational Databases
+Relational and Non-relational databases do data modelling differently.
+
+**Relational Model**
+This model organized data into one or more *tables(or relations)* of *columns(attributes)* and *rows(tuples)* with a unique key identifying each row.
+
+Generally each table represents one *entity type*.
+eg: customer, product
+
+**RDBMS(Relational Database Management System** is a software system used to maintain relational databases.
+
+Examples of RDBMS:
+- Oracle
+- Teradata
+- MySql
+- PostgreSQL
+- Sqlite
+- Microsoft SQL Server
+
+**SQL(Structured Query Language** is the language used across almost all relational database system for querying and maintaining the database.
+
+**Database Schema**: Collection of tables
+**Tables**: A group of rows sharing the same labelled elements(columns). eg: Customers
+
+## When to use relational databases
+Advantages of Using a Relational Database
+
+- **Flexibility for writing in SQL queries**: With SQL being the most common database query language.
+- **Modeling the data not modeling queries**
+- **Ability to do JOINS**
+- **Ability to do aggregations and analytics**
+- **Secondary Indexes available** : You have the advantage of being able to add another index to help with quick searching.
+- **Smaller data volumes**: If you have a smaller data volume (and not big data) you can use a relational database for its simplicity.
+**ACID Transactions**: Allows you to meet a set of properties of database transactions intended to guarantee validity even in the event of errors, power failures, and thus maintain data integrity.
+**Easier to change to business requirements**
+
+## ACID Transactions
+ACID properties are properties of database transactions intended to guarantee validity even in the event of errors or power failures.
+
+- **Atomicity**: The whole transaction is processed or nothing is processed. 
+- **Consistency**: Only transactions that abide by constraints and rules are written into the database, otherwise the database keeps the previous state.
+- **Isolation**: Transactions are processed independently and securely, order does not matter. 
+- **Durability**: Completed transactions are saved to database even in cases of system failure. 
+
+## When not to use Relational Databases
+- Have large amounts of data
+- Need to be able to store different data type formats
+- Need high throughput -- fast reads: While ACID transactions bring benefits, they also slow down the process of reading and writing data. If you need very fast reads and writes, using a relational database may not suit your needs. 
+- Need a flexible schema
+- Need high availability
+- Need horizontal scalability
+
+## PostgresSQL
+PostgreSQL is an open-source object-relational database system.
+- PostgreSQL uses and builds upon SQL database language by providing various features that reliably store and scale complicated data workloads.
+- PostgreSQL SQL syntax is different than other relational databases SQL syntax.
+
+All relational and non-relational databases tend to have their own SQL syntax and operations you can perform that are different between types of implementations.
+
+**Exercise**: [Creating a Table with Postgres](exercises/L1_Exercise_1_Creating_a_Table_with_Postgres.ipynb)
+
+## NoSQL Databases
+> ..has a simpler design, simpler horizontal scaling, and finer control of availability. Data structures used are different than those in Relational Database are make some operations faster. -- Wikipedia
+
+NoSQL databases were created do some of the issues faced with Relational Databases.
+
+### NoSQL Database Implementations**:
+- **Apache Cassandra (Partition Row store)**: The data is distributed by partitions across nodes or servers and the data is organized in the columns and rows format.
+- **MongoDB (Document store)**: in addition to the key lookups performed by key-value store, the database also offers an API or query language that retrieves document based on its contents making search on documents easier.
+- **DynamoDB (Key-Value store)**: the data is represented as a collection of key and value pairs.
+- **Apache HBase (Wide Column Store)**: it also used tables, rows and columns. But unlike a relational database, the names and format of the columns an vary from row to row in the same table. That's it enables a flexible schema.
+- **Neo4J (Graph Database)**: here relationships between entities is more the focus. The data is represented as nodes and edges.
+
+### Basics of Apache Cassandra
+>...provides **scalability** and **high availability** without compromising performance. Linear scalability and proven **fault-tolerance** on commodity hardware or cloud infrastructure make it the perfect platform for mission-critical data. -- Apache Cassandra Documentation
+
+<figure>
+  <img src="images/basics_of_cassandra.png" alt="DWH Tech perspective" width=60% height=60%>
+</figure>
+
+- Keyspace
+  - Collection of tables
+- Table
+  - A group of partitions
+- Rows
+  - A single item
+- Partition
+  - Fundamental unit of access
+  - Collection of row(s)
+  - How data is distributed
+- Primary Key
+  - Primary is key made up of a partition key and clustering columns.
+- Columns
+  - Clustering and Data
+  - Labelled element
+- Apache Cassandra uses its on query language called **CQL**.
+
+**Good use cases for NoSQL (and more specifically Apache Cassandra)**:
+  - Transaction logging (retail, health care)
+  - Internet of Things (IoT)
+  - Time series data
+  - Any workload that is heavy on writes to the database (since Apache Cassandra is optimized for writes).
+
+**Would Apache Cassandra be a hindrance for my analytics work? If yes, why?**
+Yes, if you are trying to do analysis, such as using GROUP BY statements. Since Apache Cassandra requires data modeling based on the query you want, you can't do ad-hoc queries. However you can add clustering columns into your data model and create new tables.
+
+**When to you use a NoSQL database?**
+- Large amount of data
+- Need high availability
+- Need to be able to scale out quickly
+
+### Common types of 
+
+# Relational Data Models
+
+# NoSQL Data Models
+
+# Project: Data Modelling with Apache Cassandra
