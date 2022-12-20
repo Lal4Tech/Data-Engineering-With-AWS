@@ -49,7 +49,7 @@ Data modelling is an import skill for anyone involved in the process of using an
 - Product Owners
 - Business Users
 
-## Introduction to Relational Databases
+### Introduction to Relational Databases
 Relational and Non-relational databases do data modelling differently.
 
 **Relational Model**
@@ -73,7 +73,7 @@ Examples of RDBMS:
 **Database Schema**: Collection of tables
 **Tables**: A group of rows sharing the same labelled elements(columns). eg: Customers
 
-## When to use relational databases
+### When to use relational databases
 Advantages of Using a Relational Database
 
 - **Flexibility for writing in SQL queries**: With SQL being the most common database query language.
@@ -85,7 +85,7 @@ Advantages of Using a Relational Database
 **ACID Transactions**: Allows you to meet a set of properties of database transactions intended to guarantee validity even in the event of errors, power failures, and thus maintain data integrity.
 **Easier to change to business requirements**
 
-## ACID Transactions
+### ACID Transactions
 ACID properties are properties of database transactions intended to guarantee validity even in the event of errors or power failures.
 
 - **Atomicity**: The whole transaction is processed or nothing is processed. 
@@ -93,7 +93,7 @@ ACID properties are properties of database transactions intended to guarantee va
 - **Isolation**: Transactions are processed independently and securely, order does not matter. 
 - **Durability**: Completed transactions are saved to database even in cases of system failure. 
 
-## When not to use Relational Databases
+### When not to use Relational Databases
 - Have large amounts of data
 - Need to be able to store different data type formats
 - Need high throughput -- fast reads: While ACID transactions bring benefits, they also slow down the process of reading and writing data. If you need very fast reads and writes, using a relational database may not suit your needs. 
@@ -101,7 +101,7 @@ ACID properties are properties of database transactions intended to guarantee va
 - Need high availability
 - Need horizontal scalability
 
-## PostgresSQL
+### PostgresSQL
 PostgreSQL is an open-source object-relational database system.
 - PostgreSQL uses and builds upon SQL database language by providing various features that reliably store and scale complicated data workloads.
 - PostgreSQL SQL syntax is different than other relational databases SQL syntax.
@@ -155,15 +155,36 @@ NoSQL databases were created do some of the issues faced with Relational Databas
 **Would Apache Cassandra be a hindrance for my analytics work? If yes, why?**
 Yes, if you are trying to do analysis, such as using GROUP BY statements. Since Apache Cassandra requires data modeling based on the query you want, you can't do ad-hoc queries. However you can add clustering columns into your data model and create new tables.
 
-**When to you use a NoSQL database?**
-- Large amount of data
+### When to you use a NoSQL database?
+- Need to be able to store different data type formats
+- Large amounts of data
+- Need horizontal scalability
+- Need high throughput
+- Need a flexible schema
 - Need high availability
-- Need to be able to scale out quickly
 
-### Common types of 
+### When NOT to use a NoSQL Database?
+- When you have a small dataset:
+- When you need ACID Transactions: exceptions: MongoDB
+- When you need the ability to do JOINS across tables
+- If you want to be able to do aggregations and analytics
+- If you have changing business requirements
+- If your queries are not available and you need the flexibility
+
+**Remember**:
+- NoSQL databases and Relational databases do not replace each other for all tasks
+- Both do different tasks extremely well, and should be utilized for the use cases they fit best.
+
+**Exercise**: [Creating a Table with Apache Cassandra](exercises/L1_Exercise_2_Creating_a_Table_with_Apache_Cassandra.ipynb)
+
+<hr style="border:2px solid gray">
 
 # Relational Data Models
 
+<hr style="border:2px solid gray">
+
 # NoSQL Data Models
+
+<hr style="border:2px solid gray">
 
 # Project: Data Modelling with Apache Cassandra
