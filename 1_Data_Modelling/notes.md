@@ -180,6 +180,36 @@ Yes, if you are trying to do analysis, such as using GROUP BY statements. Since 
 <hr style="border:2px solid gray">
 
 # Relational Data Models
+## Databases
+**Database**: A set of related data and the way it is organized.
+
+**Database Management System**: Computer Software that allows users to interact with the database and provides access to all of the data.
+
+In 1969 Edgar R. Codd proposed 12 rules of what makes a database management system a true relational system.
+**Rule 1**: *The information rule*:
+  All information in a relational database is represented explicitly at the logical level and in exactly one way : by values in table.
+
+## Importance of Relational Databases
+- **Standardization of data model**: Once the data is transformed into the rows and columns format, the data is standardized and you can query it with SQL.
+- **Flexibility in adding and altering tables**: Relational databases gives you flexibility to add tables, alter tables and to remove data.
+- **Data Integrity**: Data integrity is the backbone of using a relational database.
+- **Structured Query Language(SQL)**: A standard language can be used to access the data with a predefined language.
+- **Simplicity**: Data is systematically stored and modelled in tabular format.
+- **Intuitive Organization**: The spreadsheet format is intuitive but intuitive to data modeling in relational databases.
+
+## OLAP vs OLTP
+**Online Analytical Processing(OLAP)**: 
+- Databases optimized for these workloads allow complex analytical and ad hoc queries. 
+- These type of databases are optimized for reads.
+- eg: get total stock of shoes a particular store sold(this will require aggregations) 
+
+**Online Transactional Processing(OLTP)**: 
+- Databases optimized for these workloads allow less complex queries in large volume. 
+- The type of queries for these databases are read, insert, update and delete.
+- eg: get price of a show(this has very little or no aggregations).
+
+[Stackoverflow discussions](https://stackoverflow.com/questions/21900185/what-are-oltp-and-olap-what-is-the-difference-between-them) on OLAP and OLTP.
+
 
 <hr style="border:2px solid gray">
 
