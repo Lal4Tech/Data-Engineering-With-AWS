@@ -278,10 +278,24 @@ The process of normalization is a step by step process:
 
 **Exercise**: [Creating Normalized Tables](exercises/L2_Exercise_1_Creating_Normalized_Tables.ipynb)
 
+### Denormalization
+
+JOINS on the database allow for outstanding flexibility but are extremely slow. So, if we want heavy reads on the database, have to denormalize the tables.
+
+Denormalization is the process of trying to improve the read(select) performance of a database at the expense of losing some write(insert, update, delete) performance by adding redundant copies of data.
+
+Denormalization comes after carried out normalization. 
+
+**Normalization** is about trying to increase data integrity by reducing the number of copies of the data. Data that needs to be added or updated will be done in as few places as possible.
+
+**Denormalization** is trying to increase performance by reducing the number of joins between tables (as joins can be slow). Data integrity will take a bit of a potential hit, as there will be more copies of the data (to reduce JOINS).
+
+**Exercise**: [Creating Denormalized Tables](exercises/L2_Exercise_2_Creating_Denormalized_Tables.ipynb)
+
 <hr style="border:2px solid gray">
 
-# NoSQL Data Models
+## NoSQL Data Models
 
 <hr style="border:2px solid gray">
 
-# Project: Data Modelling with Apache Cassandra
+## Project: Data Modelling with Apache Cassandra
