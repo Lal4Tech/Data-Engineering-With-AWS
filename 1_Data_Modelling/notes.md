@@ -294,6 +294,75 @@ Denormalization comes after carried out normalization.
 
 <hr style="border:2px solid gray">
 
+### Fact and Dimension Tables
+
+- Work together to create an organized data model.
+- While fact and dimension are not created differently in the DDL, they are conceptual and extremely important for organization.
+- **Fact table**: consists of the measurements, metrics or facts of a business process.
+- **Dimension table**: dimension is a structure that categorizes facts and measures in order to enable users to answer business questions. Dimensions are people, products, place and time.
+- Two of the most popular data mart schema for data warehouse are:
+  - Star Schema
+  - Snowflake Schema
+- Unique primary key for each Dimension table is included in the Fact table.
+
+eg:
+
+<figure>
+  <img src="images/dimension_fact_tables.png" alt="Dimensions and Fact Tables" width=60% height=60%>
+</figure>
+
+- Dimension tables provide following info:
+  - Where the product was bought? (Dim_Store table)
+  - When the product was bought? (Dim_Date table)
+  - What product was bought? (Dim_Product table)
+
+- The Fact table provides the metric of the business process (here Sales).
+  - How many units of products were bought? (Fact_Sales table)
+
+### Star Schema
+
+- Simplest style of data mart schema
+- Consists of one or more fact tables referencing any number of dimension tables.
+- Fact table is at its center and dimension table surrounds it.
+
+**Benefits of Star Schema**:
+
+- Denormalized
+- Simplifies queries: Star schema allows relaxation of 3NF ruls and makes queries easier with simple JOINs.
+- Fast Aggregations
+
+**Drawbacks of Star Schema**:
+
+- Issues that come with denormalization
+- Data integrity issues
+- Decrease query flexibility
+- Support only one to one mapping. Many to many relationships are hard to support
+
+<figure>
+  <img src="images/music_store_database_with_star_schema.png" alt="Music Store Database with Star Schema" width=60% height=60%>
+</figure>
+
+### Snowflake Schemas
+
+- Logical arrangement of tables in a multidimensional database represented by centralized fact tables which are connected to multiple dimensions.
+- Can have multiple levels of relationships, child tables having multiple parents.
+- While star schema does not allow for one to many relationships, snowflake schema does.
+- More normalized than star schema but only in 1NF or 2NF
+- [Deep Diving in the World of Data Warehousing](https://bluepi-in.medium.com/deep-diving-in-the-world-of-data-warehousing-78c0d52f49a)
+
+**Exercise**: [Creating Fact and Dimension Tables with Star Schema](exercises/L2_Exercise_3_Dimension_Tables_with_Star_Schema.ipynb)
+
+
+
+
+
+
+
+
+
+
+<hr style="border:2px solid gray">
+
 ## NoSQL Data Models
 
 <hr style="border:2px solid gray">
