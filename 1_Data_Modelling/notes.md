@@ -352,18 +352,215 @@ eg:
 
 **Exercise**: [Creating Fact and Dimension Tables with Star Schema](exercises/L2_Exercise_3_Dimension_Tables_with_Star_Schema.ipynb)
 
+### Data Definition and Constraints
 
+#### NOT NULL
+This constraint indicates that column cannot contain a null value.
 
+```sql
+CREATE TABLE IF NOT EXISTS customer_transactions (
+  customer_id int NOT NULL, 
+  store_id int, 
+  spent numeric
+);
+```
 
+You can add NOT NULL constraints to more than one column. Usually this occurs when you have a COMPOSITE KEY.
 
+```sql
+CREATE TABLE IF NOT EXISTS customer_transactions (
+  customer_id int NOT NULL, 
+  store_id int NOT NULL, 
+  spent numeric
+);
+```
 
+#### UNIQUE
 
+- Used to specify that the data across all the rows in one column are unique within the table.
+- The UNIQUE constraint can also be used for multiple columns, so that the combination of the values across those columns will be unique within the table. In this latter case, the values within 1 column do not need to be unique.
 
+```sql
+CREATE TABLE IF NOT EXISTS customer_transactions (
+  customer_id int NOT NULL UNIQUE, 
+  store_id int NOT NULL UNIQUE, 
+  spent numeric 
+);
+```
 
+Another way to write a UNIQUE constraint is to add a table constraint using commas to separate the columns.
+
+```sql
+CREATE TABLE IF NOT EXISTS customer_transactions (
+  customer_id int NOT NULL, 
+  store_id int NOT NULL, 
+  spent numeric,
+  UNIQUE (customer_id, store_id, spent)
+);
+```
+
+#### PRIMARY KEY
+
+- One or more columns uniquely identify rows in the table.
+- If a group of columns are defined as a primary key, they are called a **composite key**.
+- By default, the PRIMARY KEY constraint has the unique and not null constraint built into it.
+
+```sql
+CREATE TABLE IF NOT EXISTS store (
+  store_id int PRIMARY KEY, 
+  store_location_city text,
+  store_location_state text
+);
+```
+
+example of composite key:
+
+```sql
+CREATE TABLE IF NOT EXISTS customer_transactions (
+  customer_id int, 
+  store_id int, 
+  spent numeric,
+  PRIMARY KEY (customer_id, store_id)
+);
+```
+
+Read more on constraints [here](https://www.postgresql.org/docs/9.4/ddl-constraints.html)
+
+### Upsert
+
+- In RDBMS language, the term upsert refers to the idea of inserting a new row in an existing table, or updating the row if it already exists in the table.
+- The action of updating or inserting has been described as "upsert".
+- This is handled in PostgreSQL is by using the **INSERT** statement in combination with the **ON CONFLICT** clause.
+
+eg:
+Create table:
+
+```sql
+CREATE TABLE IF NOT EXISTS customer_address (
+  customer_id int PRIMARY KEY, 
+  customer_street varchar NOT NULL,
+  customer_city text NOT NULL,
+  customer_state text NOT NULL
+);
+```
+
+**INSERT data**:
+
+```sql
+INSERT into customer_address (
+VALUES
+  (432, '758 Main Street', 'Chicago', 'IL'
+);
+
+```
+
+**ON CONFLICT DO NOTHING**:
+
+```sql
+INSERT INTO customer_address (customer_id, customer_street, customer_city, customer_state)
+VALUES
+(
+  432, '923 Knox Street', 'Albany', 'NY'
+) 
+ON CONFLICT (customer_id) 
+DO NOTHING;
+
+```
+
+**ON CONFLICT DO UPDATE**
+
+```sql
+INSERT INTO customer_address (customer_id, customer_street)
+VALUES
+(
+  432, '923 Knox Street, Suite 1' 
+) 
+ON CONFLICT (customer_id) 
+DO UPDATE
+  SET customer_street = EXCLUDED.customer_street;
+```
+
+**More on UPSERT**:
+
+- [PostgreSQL tutorial](https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-upsert/)
+- [PostgreSQL documentation](https://www.postgresql.org/docs/9.5/sql-insert.html)
 
 <hr style="border:2px solid gray">
 
 ## NoSQL Data Models
+
+NoSQL = Not Only SQL
+
+### When to use NoSQL
+
+- Need high availability
+- Have large amount of data
+- Need Linear scalability
+- Low Latency
+- Need fast reads and write
+
+### Apache Cassandra
+
+- Open Source NoSQL DB
+- Masterless Architecture
+- High availability
+- Linearly Scalable
+
+### Distributed Databases
+
+Distributed databases are databases that have scaled out horizontally.
+
+In a distributed database, in order to have high availability you will need copies of your data.
+
+#### Eventual Consistency
+
+A consistency model used in distributed computing to achieve high availability that informally guarantees that, if no new updates are made to a given data item, eventually all access to that item will return the last updated value.
+
+This means:
+
+- Overtime if no new changes are made, each copy of the data will be the same.
+- But, if there are new changes, the data may be different in different locations.
+- The data may be inconsistent for only milliseconds.
+- There are workarounds to prevent stale data.
+
+*Notes*:
+
+- Apache Cassandra is using peer to peer database architecture(every node is connected to every other nodes). 
+- Apache Cassandra architecture:
+  - [Understanding the architecture](https://docs.datastax.com/en/archived/cassandra/3.0/cassandra/architecture/archTOC.html)
+  - [Cassandra Architecture](https://www.tutorialspoint.com/cassandra/cassandra_architecture.htm)
+- [How Cassandra reads and writes data](https://docs.datastax.com/en/archived/cassandra/3.0/cassandra/dml/dmlIntro.html)
+
+### CAP Theorem
+
+A theorem in computer science that states:
+> It is impossible for a distributed data store to simultaneously provide more than two out the following three guarantees of **consistency**, **availability** and **partition tolerance**.
+
+- **Consistence**: Every read from the database gets the latest(and correct) piece of data or an error.
+- **Availability**: Every requests is received and a response is given -- without guarantee that the data is the latest update.
+- **Partition Tolerance**: The system continues to work regardless of losing network connectivity between nodes.
+
+*Notes*:
+
+- [Discussion about ACID vs. CAP](https://www.voltactivedata.com/blog/2015/10/acid-vs-cap/)
+- *The CAP theorem implies that in the presence of a network partition, one has to choose between consistency and availability.* So there is no such thing as Consistency and Availability in a distributed database since it must always tolerate network issues. You can only have Consistency and Partition Tolerance (CP) or Availability and Partition Tolerance (AP).
+- Apache Cassandra it is about **Eventual Consistency** and it support Availability and Partition Tolerance in the CAP theorem.
+
+### Denormalization in Apache Cassandra
+
+Data Modelling in Apache Cassandra:
+
+- Denormalization is not just okay -- it's a must
+- Denormalization must be done for fast reads
+- Apache Cassandra has been optimized for fast writes
+- **ALWAYS** think Queries first
+- One table per query is a great strategy
+- Apache Cassandra **does not** allow for JOINs between tables.
+
+*Notes*:
+
+- When using Apache Cassandra, if your business need calls for quickly changing requirements, you need to create a new table to process the data.
+- In relational databases, one query can access and join data from multiple tables. But in Apache Cassandra, one query can pull data from a single table.
 
 <hr style="border:2px solid gray">
 
