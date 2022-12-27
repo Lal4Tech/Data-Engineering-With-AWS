@@ -562,6 +562,20 @@ Data Modelling in Apache Cassandra:
 - When using Apache Cassandra, if your business need calls for quickly changing requirements, you need to create a new table to process the data.
 - In relational databases, one query can access and join data from multiple tables. But in Apache Cassandra, one query can pull data from a single table.
 
+### CQL
+
+*Cassandra Query Language*
+
+- Very similar to SQL
+- Following are not supported by CQL
+  - JOINS
+  - GROUP BY
+  - Subqueries
+
+**Exercises**
+
+- [Three Queries Three Tables](exercises/L3_Exercise_1_Three_Queries_Three_Tables.ipynb)
+
 <hr style="border:2px solid gray">
 
 ## Project: Data Modelling with Apache Cassandra
