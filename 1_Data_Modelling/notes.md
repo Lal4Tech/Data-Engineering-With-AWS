@@ -572,9 +572,18 @@ Data Modelling in Apache Cassandra:
   - GROUP BY
   - Subqueries
 
-**Exercises**
+**Exercise**: [Exercise: Three Queries Three Tables](exercises/L3_Exercise_1_Three_Queries_Three_Tables.ipynb)
 
-- [Three Queries Three Tables](exercises/L3_Exercise_1_Three_Queries_Three_Tables.ipynb)
+### Primary Key
+
+- Must be unique
+- The PRIMARY KEY is made up of either just the PARTITION KEY or may also include additional CLUSTERING COLUMNS .
+- The PARTITION KEY will determine the distribution of data across the system
+- Partition key's row value will be hashed and stored on th node in the system that holds that range of values.
+- More on Primary key: [DataStax Documentation](https://docs.datastax.com/en/archived/cql/3.3/cql/cql_using/useSimplePrimaryKeyConcept.html#useSimplePrimaryKeyConcept).
+
+**Exercise**: [Primary_Key](exercises/L3_Exercise_2_Primary_Key.ipynb)
+
 
 <hr style="border:2px solid gray">
 
