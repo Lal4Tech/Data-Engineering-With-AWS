@@ -284,7 +284,7 @@ JOINS on the database allow for outstanding flexibility but are extremely slow. 
 
 Denormalization is the process of trying to improve the read(select) performance of a database at the expense of losing some write(insert, update, delete) performance by adding redundant copies of data.
 
-Denormalization comes after carried out normalization. 
+Denormalization comes after carried out normalization.
 
 **Normalization** is about trying to increase data integrity by reducing the number of copies of the data. Data that needs to be added or updated will be done in as few places as possible.
 
@@ -355,6 +355,7 @@ eg:
 ### Data Definition and Constraints
 
 #### NOT NULL
+
 This constraint indicates that column cannot contain a null value.
 
 ```sql
@@ -525,7 +526,7 @@ This means:
 
 *Notes*:
 
-- Apache Cassandra is using peer to peer database architecture(every node is connected to every other nodes). 
+- Apache Cassandra is using peer to peer database architecture(every node is connected to every other nodes).
 - Apache Cassandra architecture:
   - [Understanding the architecture](https://docs.datastax.com/en/archived/cassandra/3.0/cassandra/architecture/archTOC.html)
   - [Cassandra Architecture](https://www.tutorialspoint.com/cassandra/cassandra_architecture.htm)
@@ -584,6 +585,40 @@ Data Modelling in Apache Cassandra:
 
 **Exercise**: [Primary_Key](exercises/L3_Exercise_2_Primary_Key.ipynb)
 
+### Clustering Columns
+
+- The clustering column will will determine the sort order(ascending order) within a partition.
+- More than one clustering column can be added or none.
+- Clustering column will sort in order of how they were added to the primary key.
+- Cannot use the clustering columns out of order in the SELECT statement.
+- It's possible to omit a certain clustering column in the SELECT statement.
+
+- More info:
+  - [Compound Primary Key](https://docs.datastax.com/en/archived/cql/3.3/cql/cql_using/useCompoundPrimaryKeyConcept.html)
+  - [Difference between partition key, composite key and clustering key in Cassandra?](https://stackoverflow.com/questions/24949676/difference-between-partition-key-composite-key-and-clustering-key-in-cassandra)
+    - The **Partition Key** is responsible for data distribution across your nodes.
+    - The **Clustering Key** is responsible for data sorting within the partition.
+    - The **Primary Key** is equivalent to the Partition Key in a single-field-key table (i.e. Simple).
+    - The **Composite/Compound** Key is just any multiple-column key
+  - Examples(from aforementioned stackoverflow link):
+    - PRIMARY KEY (a): The partition key is a.
+    - PRIMARY KEY (a, b): The partition key is a, the clustering key is b.
+    - PRIMARY KEY ((a, b)): The composite partition key is (a, b).
+    - PRIMARY KEY (a, b, c): The partition key is a, the composite clustering key is (b, c).
+    - PRIMARY KEY ((a, b), c): The composite partition key is (a, b), the clustering key is c.
+    - PRIMARY KEY ((a, b), c, d): The composite partition key is (a, b), the composite clustering key is (c, d).
+
+**Exercise**: [Clustering Column](exercises/L3_Exercise_3_Clustering_Column.ipynb)
+
+### WHERE Clause
+
+- Data Modelling in Apache Cassandra is query focused and that focus needs to on the **WHERE** clause.
+- Failure to include a WHERE clause will result in an error.
+- The PARTITION KEY must be included in the query and any CLUSTERING COLUMNS can be used in the order they appear in your PRIMARY KEY.
+- It's recommended that one partition key be queried at a time for performance implications.
+- It is possible to do a select * from table if you add a configuration ALLOW FILTERING to query. This is risky. So use only if absolutely necessary. Read more: [ALLOW FILTERING explained](https://www.datastax.com/blog/allow-filtering-explained).
+
+**Exercise**: [Using the WHERE Clause](exercises/L3_Exercise_4_Using_the_WHERE_Clause.ipynb)
 
 <hr style="border:2px solid gray">
 
