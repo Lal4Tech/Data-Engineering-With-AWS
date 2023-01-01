@@ -14,7 +14,7 @@
 - Properties of NoSQL data models
   - When to use NoSQL databases
   - Distributed database design
-  - CAP Theorum
+  - CAP Theorem
 - How to create relational data models
   - Relational data modeling with Postgres
 - How to create NoSQL data models
