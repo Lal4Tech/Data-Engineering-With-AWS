@@ -126,6 +126,7 @@ Example:
 - [Sakila](https://video.udacity-data.com/topher/2021/August/61120e06_pagila-3nf/pagila-3nf.png) is a sample database created by MySql.
 - The postgresql version of it is called [Pagila](https://github.com/devrimgunduz/pagila).
 
+**Exercise**: [Exploratory Data Analysis](exercises/1_Exploratory_Data_Analysis.ipynb)
 
 <hr style="border:2px solid gray">
 
