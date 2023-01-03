@@ -132,6 +132,9 @@ Example:
 
 **Exercise**: [Dimensional Modeling](exercises/2_Dimensional_Modeling.ipynb) 
 
+### ETL
+**Exercise**: [ETL](exercises/3_ETL.ipynb)
+
 <hr style="border:2px solid gray">
 
 ## ETL and Data Warehouse Technology in the Cloud
