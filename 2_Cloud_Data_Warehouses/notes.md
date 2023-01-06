@@ -143,32 +143,42 @@ Example:
 - Easy to communicate to business users
 - Can perform Roll Up, Drill Down, Slice and Dice operations on OLAP cube dimensional data.
 - OLAP Cube Operations
-  - **Rollup**: Aggregates or combines values and reduces number of rows or columns. eg: sum up the sales of each city by country. eg. US, France
-  - **Drill Down**: Decomposes values and increases number of rows or columns. Which means we are going to take each city and decompose it. eg. to districts.
+  - **Roll-up**: Aggregates or combines values and reduces number of rows or columns. eg: sum up the sales of each city by country. eg. US, France
+  - **Drill-down**: Decomposes values and increases number of rows or columns. Which means we are going to take each city and decompose it. eg. to districts.
   - With Rolling up we get fewer values. But when drilling down we ge more values.
   - **Slice**: Reducing N dimensions to N-1 dimensions by restricting one dimension to a single value. eg: month='MAR'
   - **Dice**: Same dimensions but computing a sub-cube by restricting some of the values of the dimensions. eg: month in ['Feb', 'March'] and movie in ['Avtar', 'Batman'] branch = 'NY'
+  - **Grouping Sets**: Group by CUBE (dim1, dim2, ..), produces all combinations of different lengths in one go. This view could be materialized in a view and queried, which would save lots of repetitive aggregations.
+    - GROUP by CUBE Statement
+      - Do one pass through the facts table
+      - Aggregate all possible combinations.
+  - **Cube() function**:
+    - Often for 3 dimensions, you want to aggregate a fact by multiple dimensions
+    - Equivalent to *grouping sets ()* but no need to specify the combinations of columns.
 
 <figure>
   <img src="images/olap_cube.png" alt="OLAP Cube" width=60% height=60%>
 </figure>
 
+**Exercises**:
 
+- [Roll-up and Drill-down](exercises/4_Roll_up_and_Drill_Down.ipynb)
+- [Slicing and Dicing](exercises/5_Slicing_and_Dicing.ipynb)
+- [Grouping Sets](exercises/6_Grouping_Sets.ipynb)
+- [Cube](exercises/7_Cube.ipynb)
+- [OLAP Cubes all exercises](exercises/8_OLAP_Cubes_all.ipynb)
 
 <hr style="border:2px solid gray">
 
 ## ETL and Data Warehouse Technology in the Cloud
 
-
 <hr style="border:2px solid gray">
 
 ## AWS Data Warehouse Technologies
 
-
 <hr style="border:2px solid gray">
 
 ## Implementing a Data Warehouse on AWS
-
 
 <hr style="border:2px solid gray">
 
