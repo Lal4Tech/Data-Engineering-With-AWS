@@ -133,6 +133,7 @@ Example:
 **Exercise**: [Dimensional Modeling](exercises/2_Dimensional_Modeling.ipynb) 
 
 ### ETL
+
 **Exercise**: [ETL](exercises/3_ETL.ipynb)
 
 ### OLAP Cubes
@@ -172,9 +173,298 @@ Example:
 
 ## ETL and Data Warehouse Technology in the Cloud
 
+You will use several technologies when you’re building data warehouse solutions in a cloud environment.
+
+You'll be working with:
+
+- **Database storage technologies** for
+  - Ingesting data
+  - Making it available to analytics consumers.
+- **Data pipeline technologies** to move data 
+  - Frm source to warehouse
+  - Between the stages of the Extract, Transform and Load (ETL) processes.
+- End-to-end data warehouse solution that provides the ability to manage the various parts of a data warehouse from a single application.
+
+Modern cloud infrastructures allow data warehouses to be scaled on-demand in response to changing needs.
+
+Some of the key benefits of moving to cloud data warehouses from on-premise include:
+
+- **Scalability**: large amounts of data can be loaded into the data warehouse environment, processed, and stored faster and with relative ease.
+- **Flexibility**: ability to add and remove different types of resources from data pipelines as needed. This allows for flexibility in the process as business needs change.
+- **Cost shifting**: is a result of leveraging cloud database technology to perform the costly and time-consuming transformation of data as the last part of the process rather than doing it earlier as is typical with on-premise data warehouses. By pushing it later, the business can prioritize which transforms they want to complete “just in time” for the business.
+
+### From ETL to ELT
+
+Traditional ETL models have worked for decades but the introduction of massive scalability through cloud data warehousing has allowed us to flip the Transform and Load steps.
+
+- **ETL**: Transformation happens on an intermediate server
+- **ELT**: Transformation happens on the destination server. Data are loaded into the destination using either raw data or staging tables.
+
+The benefits of doing ELT include:
+
+- **Scalability**: massive amounts of data can be loaded into the data warehouse environment with relative ease.
+- **Flexibility**: the Transform step takes place using the same tech stack as the data warehouse runs on allowing for more flexibility in the process as business needs change.
+- **Cost shifting**: the Transform step is often the most costly and by doing it last, Data Engineers can perform Just In Time transformations to meet the highest priority business needs first.
+- Better performance for large datasets
+- More flexibility for unstructured (NoSQL) datasets
+
+Read: [Data loading strategies for dedicated SQL pool in Azure Synapse Analytics](https://learn.microsoft.com/en-us/azure/synapse-analytics/sql-data-warehouse/design-elt-data-loading)
+
+### Cloud Managed SQL Storage
+
+Data Warehouses in the cloud leverage many of the same SQL style, relational databases that are used for OLTP systems.
+
+- Oracle
+- Microsoft SQL Server
+- PostgreSQL
+- MySQL
+- MariaDB
+
+The major cloud providers provide all of these databases as managed databases meaning the user doesn't have to manage the hardware resources to gain optimal performance.
+
+- **Microsoft Azure**
+  - Azure SQL Database (MS SQL Server)
+  - Azure Database for MySQL
+  - Azure Database for MariaDB
+  - Azure Database for PostgreSQL
+- **GCP**
+  - Cloud SQL (MySQL, PostgreSQL, and MS SQL Server)
+- **AWS**
+  - Amazon RDS (MySQL, PostgreSQL, MariaDB, Oracle, MS SQL Server)
+
+### Cloud Managed NoSQL Storage
+
+ELT makes it easier to use many NoSQL database management systems in Data Warehousing scenarios. These database come in many flavors such as:
+
+- Key value
+- Document
+- Column oriented
+- Graph
+- Time series
+
+There are two primary ways cloud service providers offer NoSQL database systems:
+
+- **Platform API**: a single platform provides multiple APIs to various types of NoSQL databases.
+- **Individual Services**: each type of NoSQL database is offered as a separate services.
+
+Each of the major cloud providers offers a variety of managed NoSQL databases:
+
+- **Azure CosmosDB**
+  - Gremlin - graph database
+  - MongoDB - document
+  - Cassandra - column oriented
+- GCP
+  - Big Table - column oriented
+  - Firestore - document
+  - MongoDB Atlas - document
+- AWS
+  - DynamoDB - Key value
+  - DocumentDB - document
+  - Keyspaces = column oriented
+  - Neptune - graph
+  - Time stream - time series
+
+### Cloud ETL Pipeline Services
+
+ETL / ELT processes rely on data pipelines often built using cloud-based tools.
+
+Major Cloud providers
+
+- Azure Data Factory
+- AWS Glue
+- GCP Dataflow
+
+In addition to these tools, a large number of companies offer cloud-based tools for solving ETL / ELT challenges. Some of the major tool providers in this space are:
+
+- Informatica
+- Talend
+- Xplenty
+- Matillion
+
+One advantage of doing ELT over ETL is the ability to load large amounts of data quickly. One excellent example of this is ingesting streaming data. In modern architectures, this streaming data is often coming from Internet of Things (IoT) devices; however, it could be coming from more traditional sources such as server or transaction logs.
+
+Each of the major cloud platforms has offering for ingesting large amounts of streaming data:
+
+- Azure - Streaming Analytics
+- AWS - Kinesis
+- GCP - Dataflow
+
+### Cloud Data Warehouse Solutions
+
+Modern cloud data warehouse solutions seamlessly combine elements from Cloud Storage and Cloud Pipelines with powerful analytics capabilities. Each of the three major cloud providers has its own flavor of Cloud Data Warehouse that works seamlessly with its other cloud data engineering offerings.
+
+- Azure Synapse
+- Amazon Redshift
+- GCP Big Query
+
 <hr style="border:2px solid gray">
 
+
 ## AWS Data Warehouse Technologies
+
+### Using AWS Data Services
+
+- AWS is major provider in cloud computing industry
+- \> 140 services in compute, storage, databases, networking, developer tools, security etc.
+- Access services via:
+  - AWS management console
+  - Command Line Interface(CLI)
+  - Software Development Kits(SDK)
+
+### Redshift Exercise: Create an IAM Role
+
+To create a role:
+
+1. In AWS management console, navigate to the IAM service dashboard.
+2. In the left navigation pane, choose **Roles**.
+3. Choose **Create role**.
+4. In the **AWS Service** group as the trusted entity, and choose **Redshift service**.
+5. Under **Select your use case**, choose **Redshift - Customizable**, and then Click Next.
+6. On the **Attach permissions policies** page, search for and select the **AmazonS3ReadOnlyAccess** policy, and then click on the Next.
+7. For Role name, enter *myRedshiftRole*. Optionally add tag. Then choose *Create Role*.
+8. Wait for role to be created with success message: *The role myRedshiftRole has been created*
+
+Official Docs:
+
+- [Creating IAM roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create.html)
+- [Getting started with Amazon Redshift](https://docs.aws.amazon.com/redshift/latest/gsg/getting-started.html)
+
+### Redshift Exercise: Create Security Group
+
+> A security group will act as firewall rules for the Redshift cluster to control inbound and outbound traffic.
+
+Create a security group that will be used later to authorize access to Redshift cluster.
+
+1. Navigate to the **EC2 service**
+2. Under **Network and Security** in the left navigation pane, select **Security Groups**. Click the **Create Security Group** button to launch a wizard.
+3. In the wizard enter basic details:
+   - Security Group name: *redshift_security_group*
+   - Description: *Authorize redshift cluster access*
+   - VPC: Choose the default VPC. It is a VPC in a default region, and has a public subnet in each Availability Zone. If a default VPC doesn't show up, [create a default VPC](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html#create-default-vpc).
+4. In the Inbound rules section, click on **Add Rule** and enter the following values:
+   - Type: Custom TCP
+   - Protocol: TCP
+   - Port range: 5439 (The default port for Amazon Redshift is 5439)
+   - Source type: Custom
+   - Source: 0.0.0.0/0 (anywhere in the world): not recommended.  In a real environment, we would create inbound rules based on our own network settings.
+5. Outbound rules allow traffic to anywhere by default.
+6. Click on the **Create security group** button at the bottom.
+
+Official Docs:
+
+- [Created traffic to resources using security groups](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html)
+
+### Redshift Exercise: Create an IAM User
+
+create an IAM user that you will use to access your Redshift cluster.
+
+1. Navigate to the **IAM console**. In the left navigation pane, choose Users, and click on the Add User button. It will launch a new wizard.
+2. Set user details: Enter a name for your user , say *airflow_redshift_user*, and choose **Programmatic access**. Then click on the **Next: Permissions** button.
+3. Set permissions: Choose Attach existing policies directly option.
+   - Search for redshift and select AmazonRedshiftFullAccess.
+   - Then, search for S3 and select AmazonS3ReadOnlyAccess.
+   - After selecting both policies, choose Next: Tags. Skip this page and choose Next: Review.
+4. Review choices and finally click on the Create user button.
+5. Save your credentials securely.
+
+Official Docs:
+
+- [Creating an IAM user in your AWS account](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html)
+
+### Redshift Exercises: Launch a Redshift cluster
+
+Create cluster by going to Amazon Redshift console:
+
+1. First create subnet group if not exits: choose default vpc and click add all the subnets for this VPC
+2. Go to cluster: Click Create cluster
+3. Choose production
+4. Choose default config node, vCPUS and storage.
+   - 1 node of dc2.large hardware type. It is a high performance with fixed local SSD storage
+   - 2 vCPUs
+   - 160 GB storage capacity
+5. Choose default values for database configuration:
+   - database name: dev
+   - database port: 5439
+   - Master username: awsuser
+   - Master user password: enter password
+6. Choose the IAM role created earlier, *myRedshiftRole*, from the drop-down and click on the Associate IAM role button.
+7. Toggle the button to turn off the "use defaults" feature, and expand the Network and security section. Choose the following values:
+   - Virtual private cloud (VPC): Default VPC
+   - VPC security groups: Choose the redshift_security_group created earlier.
+   - Cluster subnet group: Choose the one create earlier
+   - Availability Zone: No preference
+   - Enhanced VPC routing: Disabled
+   - Publicly accessible: Enable
+8. Review your Cluster configuration and click on the Create cluster button at the bottom. Wait for cluster to be created and status changed to *Available*.
+
+**Delete** the cluster after user for cost savings:
+
+1. Select check box near cluster
+2. Choose delete from actions menu
+3. Choose *Create final snapshot* to restore it from later
+4. Click Delete cluster
+
+Official Docs:
+- [Bringing your own data to Amazon Redshift](https://docs.aws.amazon.com/redshift/latest/gsg/bring-own-data.html)
+
+### AWS S3
+
+Create a Bucket:
+
+1. In S3 Dashboard, create bucket.
+2. Provide a unique name and choose required region
+3. Choose public visibility
+4. Disable bucket versioning, default encryption
+5. Click **Create bucket**
+
+Official Docs:
+- [Getting started with Amazon S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/GetStartedWithS3.html)
+
+### AWS RDS Database
+
+AWS Relational Database Service(RDS) is a managed relational database service. It manages common database administration tasks, resizes automatically, and is cost-friendly.
+
+Create PostgresSQL database:
+
+1. In RDS console, choose the Databases menu item on the left navigation pane, and click on the **Create Database** button.
+2. Choose a database creation method(Standard create/Easy create): Select **standard create**
+3. Select **PostgreSQL** from **Engine Options**.
+4. **Templates**: Use either the RDS Free Tier or Dev/Test template.
+5. **Settings**: DB instance identifier, such as postgreSQL-test, and master credentials (username and a password).
+6. **DB instance class**: Choose Burstable classes
+7. **Storage** and **Availability & durability**: Choose defaults
+8. **Connectivity**:
+   - VPC: Default VPC
+   - Subnet group: default
+   - Public access: Yes
+   - VPC security group: choose default one or create new one.
+   - Availability zone: No preference
+   - Database prot: 5432(default)
+9. Leave the values default for the Database authentication section.
+10.**Additional configuration**:
+   - Provide the database name.
+   - In the Backup section and select 1 day, since this is for demonstration purposes.
+11.Leave the default values for the rest and click on the **Create database** button on the bottom right.
+12.Wait for database being created and status change to **Available**
+
+Official Docs:
+- [Creating an Amazon RDS DB instance](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CreateDBInstance.html)
+
+### Infrastructure As Code(IaC) on AWS: Boto3 SDK
+
+**Boto3** is a Python SDK for programmatically accessing AWS. It enables developers to create, configure, and manage AWS services. 
+
+Advantages of IaC:
+
+- **Sharing**: easily share all the step with others
+- **Reproducibility**: can make sure that no steps are skipped.
+- **Multiple Deployments**: can create identical environments easily and efficiently.
+- **Maintainability**: can keep track of changes by comparing code.
+
+[Boto3 Documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html)
+
+
+
 
 <hr style="border:2px solid gray">
 
