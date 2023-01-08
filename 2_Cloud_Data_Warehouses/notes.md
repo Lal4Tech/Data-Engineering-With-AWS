@@ -463,8 +463,7 @@ Advantages of IaC:
 
 [Boto3 Documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html)
 
-
-
+**Exercise**: [Infrastructure as a code](exercises/9_Infra_as_a_Code.ipynb)
 
 <hr style="border:2px solid gray">
 
