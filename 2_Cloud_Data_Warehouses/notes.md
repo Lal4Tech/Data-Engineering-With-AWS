@@ -535,11 +535,15 @@ Advantages of IaC:
   <img src="images/dwh_etl.png" alt="Data Warehouse ETL" width=60% height=60%>
 </figure>
 
-**Redshift SQL to SQL ETL**:
+**ETL Implementation with AWS**:
 
 <figure>
   <img src="images/redshift_etl.png" alt="Redshift SQL to SQL ETL" width=60% height=60%>
 </figure>
+
+- Here the purpose of EC2 instance is to act as a client to RDS and Redshift to issue COPY commands.
+- The Advantage of using S3 is that it offers a very reliable, scalable and worry-free storage solution
+- For very small data, we can copy data directly from the EC2 machine instead of using S3.
 
 <figure>
   <img src="images/redshift_etl_dataflow.png" alt="ETL dataflow with Redshift artchitecture" width=60% height=60%>
@@ -579,6 +583,11 @@ Here Redshift will parallelize the processing of the data on the prefix. That's 
 <figure>
   <img src="images/ingesting_with_manifest_example.png" alt="Example for Ingesting with Manifest file" width=60% height=60%>
 </figure>
+
+**Notes**:
+
+- In the ETL implementation on AWS, the purpose of EC2 instance is to act as a client to RDS and Redshift to issue COPY commands.
+
 
 ### Optimizing Table Design with Distribution Styles
 
