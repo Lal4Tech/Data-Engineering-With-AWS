@@ -469,6 +469,120 @@ Advantages of IaC:
 
 ## Implementing a Data Warehouse on AWS
 
+
+
+### Amazon Redshift
+
+<figure>
+  <img src="images/amazon_redshift.png" alt="Redshift" width=60% height=60%>
+</figure>
+
+- Redshift is a column-oriented RDBMS
+- Best suited for storing OLAP workloads
+- Most relational databases will execute multiple queries in parallel if they have access to many cores or servers. But each query will run on only on one CPU.
+- But for data warehouses need massive parallel processing(MPP).
+- MPP databases like Amazon Redshift parallelize the execution of single query on multiple CPUs on multiple machines.
+- Tables in MPP databases are partitioned into smaller partitions and distributed across CPUsand each CPU has its own associated storage. One query can process whole table in parallel and each CPU is processing only one partition of the data.
+- Redshift is composed of 1 Leader node and one or more compute nodes.
+- Client applications talk to the leader node using protocols like JDBC or ODBC.
+
+### Redshift Architecture**
+
+<figure>
+  <img src="images/redshift_architecture.png" alt="Redshift Architecture" width=60% height=60%>
+</figure>
+
+**LeaderNode**:
+
+- Coordinates compute nodes
+- Handles external communication
+- Optimizes query execution
+
+**Compute Nodes**:
+
+- Each with own CPU, memory, and disk (determined by the node type)
+- Scale up: get more powerful nodes
+- Scale out: get more nodes
+- Each node is an AWS EC2 instance.
+
+**Node Slices**:
+
+- Each compute node is logically divided into a number of slices
+- Each slice in a Redshift cluster is at least 1 CPU with dedicated storage and memory for the slice.
+- A cluster with n slices can process n partitions of tables simultaneously
+- The sum of all slices across all compute nodes is the unit of parallelization.
+
+
+#### Redshift Node Types and Slices
+
+<figure>
+  <img src="images/redshift_node_types.png" alt="Redshift Node types" width=60% height=60%>
+</figure>
+
+**Compute Optimized Nodes**:
+
+- Start with these for lower costs and a capacity of 5 terabytes
+
+**Storage Optimized Nodes**:
+
+- Higher costs, not as fast, but higher capacity
+
+### Ingesting Data at Scale
+
+**Data Warehouse ETL**:
+
+<figure>
+  <img src="images/dwh_etl.png" alt="Data Warehouse ETL" width=60% height=60%>
+</figure>
+
+**Redshift SQL to SQL ETL**:
+
+<figure>
+  <img src="images/redshift_etl.png" alt="Redshift SQL to SQL ETL" width=60% height=60%>
+</figure>
+
+<figure>
+  <img src="images/redshift_etl_dataflow.png" alt="ETL dataflow with Redshift artchitecture" width=60% height=60%>
+</figure>
+
+#### Transferring Data from an S3 Staging Area to Redshift**
+
+Use the COPY Command
+  
+- Inserting data row by using INSERT will be very slow
+
+If the file is large:
+
+- It is better to break it up into multiple files
+- Ingest in Parallel: methods to know how group of files belong together
+  - File have Common prefix
+  - Use Manifest file
+  - If we prefix or manifest, the COPY command will ingest the file in parallel automatically.
+
+Other considerations:
+
+- Better to ingest from the same AWS region as that of Redshift cluster.
+- Better to compress all the CSV files
+
+Can also specify the delimiter to be used
+
+**Example of Ingesting with Prefix**:
+
+<figure>
+  <img src="images/ingesting_with_prefix_example.png" alt="Example for Ingesting with Prefix" width=60% height=60%>
+</figure>
+
+Here Redshift will parallelize the processing of the data on the prefix. That's all 10 files will get processed in parallel. It will spin up a number of workers and these compute nodes can ingest the file into Redshift in parallel.
+
+**Example of Ingesting with Manifest file**:
+
+<figure>
+  <img src="images/ingesting_with_manifest_example.png" alt="Example for Ingesting with Manifest file" width=60% height=60%>
+</figure>
+
+### Optimizing Table Design with Distribution Styles
+
+
 <hr style="border:2px solid gray">
 
 ## Project Data Warehouse
