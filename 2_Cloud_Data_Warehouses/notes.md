@@ -588,6 +588,7 @@ Here Redshift will parallelize the processing of the data on the prefix. That's 
 
 - In the ETL implementation on AWS, the purpose of EC2 instance is to act as a client to RDS and Redshift to issue COPY commands.
 
+**Exercise**: [ETL in Redshift](exercises/10_Parallel_ETL.ipynb)
 
 ### Optimizing Table Design with Distribution Styles
 
