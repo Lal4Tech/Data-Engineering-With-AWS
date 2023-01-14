@@ -652,6 +652,8 @@ Two partition strategies are:
   <img src="images/sorting_and_dist_key_syntax.png" alt="Query syntax for using sorting and distribution keys" width=60% height=60%>
 </figure>
 
+**Exercise**: [Optimizing Redshift Table Design](exercises/11_Optimizing_Redshift_Table_Design.ipynb)
+
 <hr style="border:2px solid gray">
 
 ## Project Data Warehouse
