@@ -1,0 +1,12 @@
+{
+    "MD033": {
+      "allowed_elements": [
+        "figure",
+        "img",
+        "hr"
+      ]
+    },
+    "MD013": {
+      "line_length": 500
+    }
+  }

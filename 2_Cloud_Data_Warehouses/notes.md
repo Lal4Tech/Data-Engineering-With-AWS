@@ -405,6 +405,7 @@ Create cluster by going to Amazon Redshift console:
 4. Click Delete cluster
 
 Official Docs:
+
 - [Bringing your own data to Amazon Redshift](https://docs.aws.amazon.com/redshift/latest/gsg/bring-own-data.html)
 
 ### AWS S3
@@ -448,6 +449,7 @@ Create PostgresSQL database:
 12.Wait for database being created and status change to **Available**
 
 Official Docs:
+
 - [Creating an Amazon RDS DB instance](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CreateDBInstance.html)
 
 ### Infrastructure As Code(IaC) on AWS: Boto3 SDK
@@ -468,8 +470,6 @@ Advantages of IaC:
 <hr style="border:2px solid gray">
 
 ## Implementing a Data Warehouse on AWS
-
-
 
 ### Amazon Redshift
 
@@ -511,7 +511,6 @@ Advantages of IaC:
 - Each slice in a Redshift cluster is at least 1 CPU with dedicated storage and memory for the slice.
 - A cluster with n slices can process n partitions of tables simultaneously
 - The sum of all slices across all compute nodes is the unit of parallelization.
-
 
 #### Redshift Node Types and Slices
 
@@ -592,6 +591,66 @@ Here Redshift will parallelize the processing of the data on the prefix. That's 
 
 ### Optimizing Table Design with Distribution Styles
 
+If you know about the frequent access pattern of a table, you can choose a more performant strategy by configuring different distribution options for your cluster.
+
+Two partition strategies are:
+
+- Distribution style
+  - EVEN distribution
+  - ALL distribution
+  - AUTO distribution
+  - KEY distribution
+
+#### EVEN Distribution
+
+- Round-robin over all slices to achieve load-balancing
+- Good if a table won't be joined
+
+<figure>
+  <img src="images/even_distribution.png" alt="Even distribution" width=60% height=60%>
+</figure>
+
+#### ALL Distribution
+
+- Small tables replicated on all slices(Broadcasting) to speed up joins.
+- Used frequently for dimension tables.
+
+<figure>
+  <img src="images/all_distribution.png" alt="All distribution" width=60% height=60%>
+</figure>
+
+#### AUTO Distribution
+
+- Leave decision to Redshift.
+- Small tables are distributed with ALL strategy.
+- Large tables are distributed with EVEN strategy.
+
+#### Key Distribution
+
+- Rows having similar values are placed in the same slice.
+- Sometimes lead to skew distribution because some keys are more frequent than others.
+
+<figure>
+  <img src="images/key_distribution.png" alt="Key distribution" width=60% height=60%>
+</figure>
+
+**Sorting key**:
+
+- Define columns as sort key
+- When data is loaded, rows are sorted before distribution to slices.
+- This minimizes query time since each node already have contiguous ranges of rows based on the sorting keys.
+- It's useful for queries that are frequently used in **ordery by** queries which are typically found in fact tables. eg. date dimension and its corresponding foreign key in the fact table.
+- A column can be both distribution key and sorting key.
+
+<figure>
+  <img src="images/sorting_key_distribution.png" alt="Sorting Key distribution" width=60% height=60%>
+</figure>
+
+**Query syntax**:
+
+<figure>
+  <img src="images/sorting_and_dist_key_syntax.png" alt="Query syntax for using sorting and distribution keys" width=60% height=60%>
+</figure>
 
 <hr style="border:2px solid gray">
 
