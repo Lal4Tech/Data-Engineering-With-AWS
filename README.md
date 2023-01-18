@@ -11,6 +11,7 @@ Resources and projects from Udacity Data Engineering with AWS nano degree progra
 ### Cloud Data Warehouses
 
 - [Notes](2_Cloud_Data_Warehouses/notes.md)
+- **Project**: [Data warehousing with AWS Redshift](2_Cloud_Data_Warehouses/project/README.md)
 
 ### Spark and Data Lakes
 
