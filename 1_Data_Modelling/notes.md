@@ -657,5 +657,4 @@ In this project,
 - Apply concepts learned on data modeling with Apache Cassandra and complete an ETL pipeline using Python.
 - Model your data by creating tables in Apache Cassandra to run queries.
 
-
 **Project Code**: [Data modeling with Apache Cassandra](project/data_modelling_project.ipynb)

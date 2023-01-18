@@ -32,4 +32,4 @@ As their data engineer, you are tasked with building an ETL pipeline that extrac
 - [create_tables.py](create_tables.py) will drop all existing tables and create tables a per the queries mentioned in [sql_queries.py](sql_queries.py).
 - [etl.py](etl.py) copy data from s3 to staging table and then populate *fact* and *dimension* tables.
 
-[main.ipynb](main.ipynb)main.ipynb for running complete project flow including setting up aws resources, running aforementioned etl pipeline and cleaning up resources.
+[main.ipynb](main.ipynb) for running complete project flow including setting up aws resources, running aforementioned etl pipeline and cleaning up resources.

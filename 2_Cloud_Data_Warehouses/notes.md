@@ -671,6 +671,8 @@ In this project,
 - Apply what you've learned on data warehouses and AWS to build an ETL pipeline for a database hosted on Redshift.
 - To complete the project, you will need to load data from S3 to staging tables on Redshift and execute SQL statements that create the analytics tables from these staging tables.
 
+**Project Code**: [Data warehouses](project/README.md)
+
 **References**:
 
 - [Redshift Create Table Docs](https://docs.aws.amazon.com/redshift/latest/dg/r_CREATE_TABLE_NEW.html)
