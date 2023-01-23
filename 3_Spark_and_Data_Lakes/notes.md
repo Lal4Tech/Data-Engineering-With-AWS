@@ -177,7 +177,67 @@ The key difference between data lakes and data lakehouse architectures is the in
 
 <hr style="border:2px solid gray">
 
-## Spark Essentials
+## Spark Essential
+
+### The Spark DAG
+
+- In distributed systems, a program should not rely on resources created by previous executions.
+- An **idempotent program** can run multiple times without any effect on the result.
+- Non-idempotent programs depend on prior state in order to start executing.
+- Example of relying on prior state:
+
+```java
+ledgerBalance = getLedgerBalanceFromLastRun()
+ledgerBalance = ledgerBalance + getLedgerBalanceSinceLastRun()
+```
+
+- Example of avoiding prior state
+
+```java
+ledgerBalance = addAllTransactions()
+```
+
+- One goal of idempotent code is that data can be processed in parallel. This is achieved by calling the same code repeatedly in different threads and on different nodes/servers for each chunk or block of data. If each program has no reliance on prior execution, there should be no problem splitting up processing.
+- Using Spark, large data can be handled using special datasets called **Resilient Distributed Datasets (RDDs)** and **DataFrames**.
+- Instead of holding the data in memory, these datasets the Spark job access to the shared resources of the cluster in a very controlled way, that is managed outside of your Spark job.
+
+```java
+# Instead of doing something like this 
+
+textFile = open("invoices.txt", "r")
+
+# invoiceList could occupy Gigabytes of Memory
+invoiceList = textFile.readlines()
+
+print(invoiceList)
+
+# Do something like this instead
+
+invoiceDataFrame = spark.read.text("invoices.txt")
+
+# Leverage Spark DataFrames to handle large datasets
+invoiceDataFrame.show(n=10)
+```
+
+<figure>
+  <img src="images/spark_dag.png" alt="Spark DAG" width=60% height=60%>
+</figure>
+
+- Every Spark program makes a copy of its input data and never changes the original parent data.
+- Because Spark doesn't change or mutate the input data, it's known as **immutable**.
+- When multiple functions calls in program, Spark chaining these together so that each accomplish small chunk of work.
+- Then Spark finds a more optimal execution plan.
+- **Lazy evaluation**: Spark uses this programming concept. Before Spark does anything with the data in your program, it first builds step-by-step directions of what functions and data it will need. It's called **Directed Acyclic Graph (DAG).**. The reference is made to the fact that no explicit repetition is inherent in the process.
+- For example, if a specific file is read more than once in your code, Spark will only read it one time.
+- Spark builds the DAG from your code, and checks if it can be delayed, waiting until the last possible moment to get the data.
+- Output of spark execution shows something like this: 
+
+```bash
+[Stage 20:> ======>                                         (0 + 1) / 1]
+```
+
+- This means your code is on stage 20 of its physical execution plan.
+- Data is processed in parallel tasks at each stage, separated by data partitions, so data in the same partition can be processed more efficiently.
 
 <hr style="border:2px solid gray">
 
