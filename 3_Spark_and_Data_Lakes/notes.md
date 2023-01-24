@@ -239,6 +239,35 @@ invoiceDataFrame.show(n=10)
 - This means your code is on stage 20 of its physical execution plan.
 - Data is processed in parallel tasks at each stage, separated by data partitions, so data in the same partition can be processed more efficiently.
 
+### Resilient Distributed Datasets
+
+Spark processes data using a cluster of distributed computing resources.
+
+1. Source data is loaded from a different sources like database.
+2. Spark converts this data into an immutable collection of objects for distributed processing called a Resilent Distributed Dataset or RDD.
+
+The features of the RDD are designed for efficient data processing; it is fault-tolerant (recomputed in case of failure), cacheable, and partitioned.
+
+<figure>
+  <img src="images/spark_catalyst.png" alt="Spark Catalyst" width=60% height=60%>
+</figure>
+
+Sparks's query optimizer(Catalyst) convert code written in high level language like python/sql to DAG:
+
+The code generated based on the execution plan operates on a lower level data abstraction called Resilient Distributed Dataset(RDD).
+
+<figure>
+  <img src="images/spark_version_rdd_mapping.png" alt="Spark Version RDD" width=60% height=60%>
+</figure>
+
+In Spark version 2.0 DataFrame and Datset API were unified.
+
+**Resources**:
+
+- [RDDs vs DataFrames and Datasets](https://www.databricks.com/blog/2016/07/14/a-tale-of-three-apache-spark-apis-rdds-dataframes-and-datasets.html)
+- [RDD prgramming guide](https://spark.apache.org/docs/latest/rdd-programming-guide.html)
+
+
 <hr style="border:2px solid gray">
 
 ## Using Spark in AWS
