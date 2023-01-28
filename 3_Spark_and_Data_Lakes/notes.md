@@ -276,11 +276,11 @@ In Spark version 2.0 DataFrame and Datset API were unified.
 
 **SparkContext**:
 
-  - First component of a Spark Program.
-  - The main entry point for Spark functionality.
-  - Connects the cluster with the application.
-  - If using lower level abstractions, will create objects with SparkContext.
-  - To create a SparkContext: create *SparkConf* object by specifying information about the application(eg: name) and the Master node's IP address(*local* if run in local mode).
+- First component of a Spark Program.
+- The main entry point for Spark functionality.
+- Connects the cluster with the application.
+- If using lower level abstractions, will create objects with SparkContext.
+- To create a SparkContext: create *SparkConf* object by specifying information about the application(eg: name) and the Master node's IP address(*local* if run in local mode).
 
 ```python
 from pyspark import SparkContext, SparkConf
@@ -292,8 +292,8 @@ sc = SparkContext(conf = configure)
 
 **SparkSession**:
 
-  - Spark SQL equivalent which is used to read data frames.
-  - To create a SparkSession, use parameters/functions like *getOrCreate* which is used to retrieve the SparkSession if already existing or create new one.
+- Spark SQL equivalent which is used to read data frames.
+- To create a SparkSession, use parameters/functions like *getOrCreate* which is used to retrieve the SparkSession if already existing or create new one.
 
 ```python
 from pyspark import SparkSession
