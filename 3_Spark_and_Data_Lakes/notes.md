@@ -336,6 +336,8 @@ eg:
 distributed_names_rdd.map(lambda name: name.lower())
 ```
 
+**Exercise**: [Maps and Lambda functions](exercises/2_rdd_song_lower_case.py)
+
 <hr style="border:2px solid gray">
 
 ## Using Spark in AWS
