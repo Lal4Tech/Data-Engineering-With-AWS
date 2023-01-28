@@ -338,6 +338,34 @@ distributed_names_rdd.map(lambda name: name.lower())
 
 **Exercise**: [Maps and Lambda functions](exercises/2_rdd_song_lower_case.py)
 
+### Data Formats
+
+Common data formats: CSV, JSON, HTML, and XML
+
+### Distributed Data stores
+
+- Store data in a fault-tolerant way.
+- Hadoop's Distributed file system, HDFS splits file into 64/128 megabyte blocks and replicates these blocks across the cluster.
+- Examples of distributed data services on cloud providers:
+  - Amazon Simple Storages Sevice(S3)
+  - Azure Blob Storage
+  - Google Cloud Storage
+
+### Imperative vs Declarative programming
+
+#### Imperative programming using DataFrames and python
+
+- Concerned with how
+- Focus on exact steps, how to get to the result
+- Data transformations with DataFrames
+
+#### Declarative programming using SQL
+
+- Concerned with what(result)
+- Provides an abstraction layer for an imperative system
+
+**Exercise**: [Reading and writing data to and fro of DataFrames](exercises/3_data_inputs_and_outputs.py)
+
 <hr style="border:2px solid gray">
 
 ## Using Spark in AWS
