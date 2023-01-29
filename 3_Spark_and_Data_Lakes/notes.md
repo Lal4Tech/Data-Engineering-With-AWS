@@ -366,6 +366,16 @@ Common data formats: CSV, JSON, HTML, and XML
 
 **Exercise**: [Reading and writing data to and fro of DataFrames](exercises/3_data_inputs_and_outputs.py)
 
+### Data Wrangling with Spark
+
+**Data Wrangling** includes data processing activities like cleaning, sorting, filtering and grouping data.
+
+**Exercises**: 
+
+- [Data Wrangling](exercises/4_data_wrangling.py)
+
+- [Data Wrangling Quiz](exercises/5_data_wrangling_quiz.py)
+
 <hr style="border:2px solid gray">
 
 ## Using Spark in AWS
