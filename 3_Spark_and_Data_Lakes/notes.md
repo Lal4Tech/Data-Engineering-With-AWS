@@ -370,11 +370,74 @@ Common data formats: CSV, JSON, HTML, and XML
 
 **Data Wrangling** includes data processing activities like cleaning, sorting, filtering and grouping data.
 
-**Exercises**: 
+**General functions**:
+
+- ```select()```: returns a new DataFrame with the selected columns
+- ```filter()```: filter rows using the given condition
+- ```where()```: an alias for ```filter```
+- ```groupBy()```: groups the DataFrame using the specified columns for aggregations.
+- ```sort()```: returns new Dataframe sorted by the specified column(s).
+- ```dropDuplicates()```: returns a new DataFrame with unique rows based on all or just a subset of columns.
+- ```withColumn()```: returns a new DataFrame by adding a column or replacing the existing column that has the same name.
+
+**Aggregate functions**:
+
+- Spark SQL provides built-in methods for the most common aggregations such as ```count()```, ```countDistinct()```, ```avg()```, ```max()```, ```min()``` etc`
+- If want to use one type of aggregation, chain aforementioned aggregate methods after ```groupBy()```.
+- If want to use different functions on different columns, use ```agg()```. eg: ```agg({"salary": "avg", "age": "max"})```
+
+**User Defined Functions(UDF)**:
+
+- Define udf method from the ```pyspark.sql.functions``` module.
+
+eg:
+
+```python
+get_hour = udf(lambda x: datetime.datetime.fromtimestamp(x / 1000.0). hour)
+
+user_log_df = user_log_df.withColumn("hour", get_hour(user_log_df.ts))
+```
+
+**Window Functions**:
+
+- Way of combining the values of ranges of rows in a DataFrame.
+- ```partitionBy()``` to sort and group the rows.
+- ```rangeBetween()``` or ```rowsBetween()```to define how wide the window should be.
+
+eg:
+
+```python
+windowval = Window.partitionBy("userId") \
+    .orderBy(desc("ts")) \
+    .rangeBetween(Window.unboundedPreceding, 0)
+
+user_log_valid_df = user_log_valid_df \
+    .withColumn("phase", Fsum("downgraded") \
+    .over(windowval))
+```
+
+**Exercises**:
 
 - [Data Wrangling](exercises/4_data_wrangling.py)
-
 - [Data Wrangling Quiz](exercises/5_data_wrangling_quiz.py)
+
+**Resources**:
+
+- [Spark SQL, DataFrames and Datasets Guide](https://spark.apache.org/docs/latest/sql-programming-guide.html#spark-sql-dataframes-and-datasets-guide)
+- [Spark with Python (PySpark) Tutorial](https://sparkbyexamples.com/pyspark-tutorial/)
+
+### Spark SQL
+
+- Query data with a declarative approach.
+- Sparks provide an SQL library which let us query the DataFrames using the SQL syntax.
+- Spark automatically optimizes SQL code, to speed up the process of manipulating and retrieving data.
+
+**Exercise**: [Data Wrangling with Spark SQL](exercises/6_data_wrangling_with_spark_sql.py)
+
+**Resources**:
+
+- [Spark SQL built-in functions](https://spark.apache.org/docs/latest/api/sql/index.html)
+- [Spark SQL guide](https://spark.apache.org/docs/latest/sql-getting-started.html)
 
 <hr style="border:2px solid gray">
 
