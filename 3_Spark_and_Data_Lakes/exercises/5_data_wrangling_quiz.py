@@ -23,7 +23,7 @@ spark = SparkSession \
         .appName("Data Frames practice") \
         .getOrCreate()
 
-logs_df = spark.read.json("nd027-Data-Engineering-Data-Lakes-AWS-Exercises/lesson-2-spark-essentials/exercises/data/sparkify_log_small.json")
+logs_df = spark.read.json("data/sparkify_log_small.json")
 
 
 # # Question 1
