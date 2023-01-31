@@ -443,6 +443,240 @@ user_log_valid_df = user_log_valid_df \
 
 ## Using Spark in AWS
 
+### Data Lakes in AWS
+
+- In AWS data lakes can be implemented using S3 storage.
+- The very top level of S3 is called an S3 Bucket. Within a bucket, you can keep many directories and files.
+
+### Spark in AWS
+
+Choices for running Spark in AWS
+
+- **EMR**:
+  - AWS Managed Spark Service.
+  - Scalable set of EC2 machines with pre-configured Spark.
+  - No need of managing systems, only configure the necessary cluster resources.
+  - HDFS is installed.
+  - Billing model: EC2 costs.
+- **EC2**:
+  - Self installed.
+  - HDFS is installed.
+  - Billing model: EC2 costs.
+- **Glue**:
+  - Serverless Spark environment with added libraries like Glue Context and Glue Dynamic Frames.
+  - Also interfaces with other AWS data services like Data Catalog and AWS Athena.
+  - HDFS is installed.
+  - Billing model: Job duration.
+
+Since Spark lacks a file distribution system to organize, store and process data files, Spark tools are often installed on Hadoop because Spark can then use the Hadoop Distributed File System (HDFS).
+
+### Introduction to Spark Glue
+
+- Glue is an AWS Service that relies on Spark.
+- We can use Glue Studio to write purely Spark scripts.
+
+**AWS Glue configuration**:
+
+<figure>
+  <img src="images/aws_glue_configuration.png" alt="AWS Glue Configuration" width=60% height=60%>
+</figure>
+
+- **Routing Table**:
+  - Stores the network paths to various locations. eg: path to S3 from within VPC.
+- **VPC Gateway**:
+  - Entity for providing access to outside networks and resources.
+  - Here to access S3 which is a shared service outside the VPC.
+- **S3 Gateway Endpoint**:
+  - By default, Glue Jobs cannot reach any networks outside of our Virtual Private Cloud (VPC).
+  - Since the S3 Service runs in different network, we need to create an S3 Gateway Endpoint.
+  - This allows S3 traffic from our Glue Jobs into our S3 buckets.
+  - Once we have created the endpoint, Glue Jobs will have a network path to reach S3.
+
+### Configure S3 VPC Gateway Endpoint
+
+<figure>
+  <img src="images/glue_job_using_s3_vpc_gateway.png" alt="AWS Glue Conflagration" width=60% height=60%>
+</figure>
+
+Steps to set up an S3 VPC Gateway Endpoint to create a network path for Glue to connect with S3.
+
+**Step 1: Create an S3 Bucket**:
+
+```bash
+aws s3 mb s3://udacity-glue-spark-bucket
+```
+
+**step 2: S3 Gateway Endpoint**:
+
+First use the AWS CLI to identify the VPC that needs access to S3:
+
+```bash
+aws ec2 describe-vpcs
+```
+
+Sample output:
+
+```json
+{
+    "Vpcs": [
+        {
+            "CidrBlock": "172.31.0.0/16",
+            "DhcpOptionsId": "dopt-00bfb659a55a2540c",
+            "State": "available",
+            "VpcId": "vpc-07050ed7ea6813884",
+            "OwnerId": "261476836151",
+            "InstanceTenancy": "default",
+            "CidrBlockAssociationSet": [
+                {
+                    "AssociationId": "vpc-cidr-assoc-03c6c629422f76d30",
+                    "CidrBlock": "172.31.0.0/16",
+                    "CidrBlockState": {
+                        "State": "associated"
+                    }
+                }
+            ],
+            "IsDefault": true
+        }
+    ]
+}
+```
+
+Note the ```VpcId``` in the output.
+
+**step 3: Routing Table**:
+
+Identify the routing table we want to configure with VPC Gateway
+
+```bash
+aws ec2 describe-route-tables
+```
+
+Sample output:
+
+```json
+{
+    "RouteTables": [
+        {
+            "Associations": [
+                {
+                    "Main": true,
+                    "RouteTableAssociationId": "rtbassoc-0bcbc81c3bfc00433",
+                    "RouteTableId": "rtb-0f7debbf05239e153",
+                    "AssociationState": {
+                        "State": "associated"
+                    }
+                }
+            ],
+            "PropagatingVgws": [],
+            "RouteTableId": "rtb-0f7debbf05239e153",
+            "Routes": [
+                {
+                    "DestinationCidrBlock": "172.31.0.0/16",
+                    "GatewayId": "local",
+                    "Origin": "CreateRouteTable",
+                    "State": "active"
+                },
+                {
+                    "DestinationCidrBlock": "0.0.0.0/0",
+                    "GatewayId": "igw-04781bf78c9c6ed79",
+                    "Origin": "CreateRoute",
+                    "State": "active"
+                }
+            ],
+            "Tags": [],
+            "VpcId": "vpc-07050ed7ea6813884",
+            "OwnerId": "261476836151"
+        }
+    ]
+}
+```
+
+Look for the ```RouteTableId```
+
+**Step 4: Create an S3 Gateway Endpoint**:
+
+```bash
+aws ec2 create-vpc-endpoint --vpc-id vpc-07050ed7ea6813884 --service-name com.amazonaws.us-east-1.s3 --route-table-ids rtb-0f7debbf05239e153
+```
+
+Sample output:
+
+```json
+{
+    "VpcEndpoint": {
+        "VpcEndpointId": "vpce-04fdd25ab5b2f9ffa",
+        "VpcEndpointType": "Gateway",
+        "VpcId": "vpc-07050ed7ea6813884",
+        "ServiceName": "com.amazonaws.us-east-1.s3",
+        "State": "available",
+        "PolicyDocument": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":\"*\"}]}",
+        "RouteTableIds": [
+            "rtb-0f7debbf05239e153"
+        ],
+        "SubnetIds": [],
+        "Groups": [],
+        "PrivateDnsEnabled": false,
+        "RequesterManaged": false,
+        "NetworkInterfaceIds": [],
+        "DnsEntries": [],
+        "CreationTimestamp": "2023-01-31T19:30:10+00:00",
+        "OwnerId": "261476836151"
+    }
+}
+```
+
+Check the new routes created:
+
+```bash
+aws ec2 describe-route-tables
+````
+
+Sample output:
+
+```json
+{
+    "RouteTables": [
+        {
+            "Associations": [
+                {
+                    "Main": true,
+                    "RouteTableAssociationId": "rtbassoc-0bcbc81c3bfc00433",
+                    "RouteTableId": "rtb-0f7debbf05239e153",
+                    "AssociationState": {
+                        "State": "associated"
+                    }
+                }
+            ],
+            "PropagatingVgws": [],
+            "RouteTableId": "rtb-0f7debbf05239e153",
+            "Routes": [
+                {
+                    "DestinationCidrBlock": "172.31.0.0/16",
+                    "GatewayId": "local",
+                    "Origin": "CreateRouteTable",
+                    "State": "active"
+                },
+                {
+                    "DestinationCidrBlock": "0.0.0.0/0",
+                    "GatewayId": "igw-04781bf78c9c6ed79",
+                    "Origin": "CreateRoute",
+                    "State": "active"
+                },
+                {
+                    "DestinationPrefixListId": "pl-63a5400a",
+                    "GatewayId": "vpce-04fdd25ab5b2f9ffa",
+                    "Origin": "CreateRoute",
+                    "State": "active"
+                }
+            ],
+            "Tags": [],
+            "VpcId": "vpc-07050ed7ea6813884",
+            "OwnerId": "261476836151"
+        }
+    ]
+}
+```
+
 <hr style="border:2px solid gray">
 
 ## Ingesting and Organizing Data in a Lakehouse
