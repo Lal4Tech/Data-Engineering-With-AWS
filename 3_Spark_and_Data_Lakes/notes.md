@@ -855,6 +855,113 @@ aws iam put-role-policy --role-name my-glue-service-role --policy-name GlueAcces
 }'
 ```
 
+### Spark Job with Glue Studio
+
+<figure>
+  <img src="images/spark_job_using_glue_studio.png" alt="Spark Job using Glue Studio" width=60% height=60%>
+</figure>
+
+- Glue Studio is a Graphical User Interface (GUI) for interacting with Glue to create Spark jobs with added capabilities.
+- Glue APIs give access to things like Glue Tables, and Glue Context.
+- The Glue Studio Visual Editor allows us to select three types of nodes when creating a pipeline:
+  - Source: the data that will be consumed in the pipeline
+  - Transform: any transformation that will be applied
+  - Target: the destination for the data
+
+Sample data to explore Glue Studio:
+
+```bash
+git clone https://github.com/udacity/nd027-Data-Engineering-Data-Lakes-AWS-Exercises
+```
+
+Copy to required S3 Bucket dir:
+
+```bash
+aws s3 cp nd027-Data-Engineering-Data-Lakes-AWS-Exercises/project/starter/customer/customer-keep-1655293787679.json  s3://udacity-glue-spark-bucket/customer/landing/
+```
+
+Display contents in s3 Bucket:
+
+```bash
+aws s3 ls s3://udacity-glue-spark-bucket/customer/landing/ 
+```
+
+Generated Python Script:
+
+```python
+import sys
+from awsglue.transforms import *
+from awsglue.utils import getResolvedOptions
+from pyspark.context import SparkContext
+from awsglue.context import GlueContext
+from awsglue.job import Job
+import re
+
+args = getResolvedOptions(sys.argv, ["JOB_NAME"])
+sc = SparkContext()
+glueContext = GlueContext(sc)
+spark = glueContext.spark_session
+job = Job(glueContext)
+job.init(args["JOB_NAME"], args)
+
+# Script generated for node S3 bucket
+S3bucket_node1 = glueContext.create_dynamic_frame.from_options(
+    format_options={"multiline": False},
+    connection_type="s3",
+    format="json",
+    connection_options={
+        "paths": ["s3://udacity-glue-spark-bucket/customer/landing/"],
+        "recurse": True,
+    },
+    transformation_ctx="S3bucket_node1",
+)
+
+# Script generated for node ApplyMapping
+ApplyMapping_node2 = Filter.apply(
+    frame=S3bucket_node1,
+    f=lambda row: (not (row["shareWithResearchAsOfDate"] == 0)),
+    transformation_ctx="ApplyMapping_node2",
+)
+
+# Script generated for node S3 bucket
+S3bucket_node3 = glueContext.write_dynamic_frame.from_options(
+    frame=ApplyMapping_node2,
+    connection_type="s3",
+    format="json",
+    connection_options={
+        "path": "s3://udacity-glue-spark-bucket/customer/trusted/",
+        "partitionKeys": [],
+    },
+    transformation_ctx="S3bucket_node3",
+)
+
+job.commit()
+```
+
+- In addition to a SparkContext, we have a concept called a GlueContext.
+- Also using something called Dynamic Frames. Dynamic Frames are very similar to Data Frames, with the added capabilities of Glue APIs. Data Frames can be converted to Dynamic Frames and vice versa.
+- To load data from s3 to Glue Dataframe
+
+```python
+df = spark.read.load("s3://my_bucket/path/to/file/file.csv")
+```
+
+If all the objects underneath the bucket have same schema:
+
+```python
+df = spark.read.load("s3://my_bucket/")
+```
+
+If there are conflicts in schema between files, then the DataFrame will not be generated.
+
+### Differences between HDFS and AWS S3
+
+- AWS S3 is an **object storage system** that stores the data using key value pairs, and HDFS is an **actual distributed file system** that guarantees fault tolerance.
+- HDFS has traditionally been installed in on-premise systems which had engineers on-site to maintain and troubleshoot the Hadoop Ecosystem, **costing more than storing data in the cloud**.
+- File formats:
+  - **AWS S3 is a binary object store**. So it can store all kinds of formats. 
+  - HDFS strictly requires a file format : the popular choices are **avro** and **parquet**, which have relatively high compression rates making it useful for storing large datasets.
+
 <hr style="border:2px solid gray">
 
 ## Ingesting and Organizing Data in a Lakehouse
