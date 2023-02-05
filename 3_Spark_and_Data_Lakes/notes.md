@@ -966,6 +966,178 @@ If there are conflicts in schema between files, then the DataFrame will not be g
 
 ## Ingesting and Organizing Data in a Lakehouse
 
+### Lakehouse Architecture
+
+- The purpose of a Lakehouse is to separate data processing into stages.
+- Data is staged and processed step by step until it becomes available for querying.
+- Lakehouse is not a specific technology. It can be implemented using any file storage and processing layer.
+- In AWS, the most common way to store files is in S3, so can implement the Lakehouse using S3 storage.
+
+<figure>
+  <img src="images/ingesting_and_organizing_data_in_a_lakehouse.png" alt="Ingesting and organizing data in a lake house" width=60% height=60%>
+</figure>
+
+#### Lakehouse Zones
+
+- With ETL, usually data is going from a semi-structured (files in directories) format to a structured format (tables).
+- With ELT, however, and with a Lakehouse, the data stays in semi-structured format, and the last zone contains enriched data where it can be picked up for processing later.
+- Deferring transformation is a hallmark of Data Lakes and Lakehouses.
+- Keeping the data at multiple stages in file storage gives more options for later analytics, because it preserves all of the format.
+- Zones:
+  - **Raw/Landing Zone**: *"For pipelines that store data in the S3 data lake, data is ingested from the source into the landing zone as-is. The processing layer then validates the landing zone data and stores it in the raw zone bucket or prefix for permanent storage. "*
+  - **Trusted Zone**: *"The processing layer applies the schema, partitioning, and other transformations to the raw zone data to bring it to a conformed state and stores it in trusted zone."*
+  - **Curated Zone**: *"As a last step, the processing layer curates a trusted zone dataset by modeling it and joining it with other datasets, and stores it in curated layer."*
+
+<figure>
+  <img src="images/datalake_zones.png" alt="Data lake zones" width=60% height=60%>
+</figure>
+
+*"Typically, datasets from the curated layer are partly or fully ingested into Amazon Redshift data warehouse storage to serve use cases that need very low latency access or need to run complex SQL queries."*
+
+Source: [Build a Lake House Architecture on AWS](https://aws.amazon.com/blogs/big-data/build-a-lake-house-architecture-on-aws/)
+
+
+### Glue Catalog
+
+- A **Glue Data Catalog** represents many sources and destinations for data. If we want to connect to another data source, we must add it to the catalog.
+- A **Glue Table** is a definition of a specific group of fields that represents a logical entity.
+  - The Glue Catalog is made up of multiple table definitions.
+  - These tables are not physically stored in Glue.
+  - Glue tables are just a metadata catalog layer. They store a reference to the data we can query or store.
+  - Methods to create Glue Table:
+    1. Glue Console
+    2. Athena Query Editor
+- **AWS Athena**: a Glue Catalog Query Tool.
+  - It is a serverless query service where you can write SQL to run ad-hoc queries on S3 buckets.
+  - Athena uses S3 to store query results.
+- **Exercise**: Create an AWS Glue Catalog and table from data in an S3 bucket. After it's created, you'll query the Glue Table with AWS Athena using SQL
+
+Resources:
+
+- [AWS Glue Data Catalog](https://docs.aws.amazon.com/glue/latest/dg/components-overview.html)
+- [AWS Glue Tables](https://docs.aws.amazon.com/glue/latest/dg/tables-described.html)
+- [AWS Athena](https://aws.amazon.com/athena/)
+
+#### Ingesting Sensitive Data
+
+**Exercise**: Ingest Accelerometer data into an S3 bucket and use AWS Athena to query the bucket and define a Glue Table from it.
+
+```bash
+git clone https://github.com/udacity/nd027-Data-Engineering-Data-Lakes-AWS-Exercises
+```
+
+```bash
+aws s3 cp nd027-Data-Engineering-Data-Lakes-AWS-Exercises/project/starter/accelerometer/  s3://udacity-glue-spark-bucket/accelerometer/landing/ --recursive
+```
+
+```bash
+aws s3 ls s3://udacity-glue-spark-bucket/accelerometer/landing/ 
+```
+
+Define a Glue Table for the Accelerometer Landing Zone
+
+- Go to Athena
+- select the database, and create a new table from S3 bucket data
+  - *Table Name*: ```accelerometer_landing```
+  - *Database*: Choose an existing database or create new one if not exists
+  - *Location of Input dataset*: ```s3://udacity-glue-spark-bucket/accelerometer/landing```
+  - *Data format*: JSON
+
+Sample Table query:
+
+```sql
+CREATE EXTERNAL TABLE IF NOT EXISTS `stedi`.`accelerometer_landing` (
+  `user` string,
+  `timeStamp` bigint,
+  `x` float,
+  `y` float,
+  `z` float
+)
+ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
+WITH SERDEPROPERTIES (
+  'ignore.malformed.json' = 'FALSE',
+  'dots.in.keys' = 'FALSE'`
+  'case.insensitive' = 'TRUE',
+  'mapping' = 'TRUE'
+)
+STORED AS INPUTFORMAT 'org.apache.hadoop.mapred.TextInputFormat' OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+LOCATION 's3://udacity-glue-spark-bucket/accelerometer/landing/'
+TBLPROPERTIES ('classification' = 'json');
+```
+
+- Query Some Sample Data:
+
+```sql
+select * from accelerometer_landing
+```
+
+### Data Privacy in Data Lakes
+
+- Data in the landing zone should not be made available for data analysis without proper scrubbing.
+- Using Glue, you can do joins between multiple data sources. You can add filters to include only those records where customers have opted to share their information.
+
+Create customer_trusted table in athena:
+
+```sql
+CREATE EXTERNAL TABLE IF NOT EXISTS `stedi`.`customer_trusted` (
+  `customerName` string,
+  `email` string,
+  `phone` string,
+  `birthDay` string,
+  `serialNumber` string,
+  `registrationDate` bigint,
+  `lastUpdateDate` bigint,
+  `shareWithResearchAsOfDate` bigint,
+  `shareWithPublicAsOfDate` bigint,
+  `shareWithFriendsAsOfDate` bigint
+)
+ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
+WITH SERDEPROPERTIES (
+  'ignore.malformed.json' = 'FALSE',
+  'dots.in.keys' = 'FALSE',
+  'case.insensitive' = 'TRUE',
+  'mapping' = 'TRUE'
+)
+STORED AS INPUTFORMAT 'org.apache.hadoop.mapred.TextInputFormat' OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+LOCATION 's3://udacity-glue-spark-bucket/customer/trusted/'
+TBLPROPERTIES ('classification' = 'json');
+```
+
+Join ```customer_trusted``` and ```accelerometer_landing``` table for users with consent for sharing data:
+
+```sql
+SELECT * FROM customer_trusted ct
+JOIN accelerometer_landing al
+ON ct.email = al.user;
+```
+
+***Create an Accelerometer Trusted Zone**:
+
+If we have the sensitive data in the accelerometer landing zone, we can write a glue job that filters the data and moves compliant records into an accelerometer trusted zone for later analysis.
+
+Create ``àccelerometer_trusted```table:
+
+```sql
+CREATE EXTERNAL TABLE IF NOT EXISTS `stedi`.`accelerometer_trusted` (
+  `user` string,
+  `x` float,
+  `y` float,
+  `z` float
+)
+ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
+WITH SERDEPROPERTIES (
+  'ignore.malformed.json' = 'FALSE',
+  'dots.in.keys' = 'FALSE',
+  'case.insensitive' = 'TRUE',
+  'mapping' = 'TRUE'
+)
+STORED AS INPUTFORMAT 'org.apache.hadoop.mapred.TextInputFormat' OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+LOCATION 's3://udacity-glue-spark-bucket/accelerometer/trusted/'
+TBLPROPERTIES ('classification' = 'json');
+```
+
+[Glue Job Script](exercises/7_accelerometer_landing_to_trusted.py)
+
 <hr style="border:2px solid gray">
 
 ## Project: STEDI Human Balance Analytics
