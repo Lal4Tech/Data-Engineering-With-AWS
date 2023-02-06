@@ -1138,6 +1138,24 @@ TBLPROPERTIES ('classification' = 'json');
 
 [Glue Job Script](exercises/7_accelerometer_landing_to_trusted.py)
 
+### Streaming Data Analysis
+
+- Spark is intended to process data that was previously generated. It doesn't process data in real time.
+- **Spark Streaming** gives us the option of processing data in near real-time.
+- Since servers are not always designed to handle large volumes of real-time data, message brokers are created which makes near real-time processing of data. eg:
+  - Kafka
+  - Simple Queue Services(AWS SQS)
+  - Amazon Kinesis
+- Messages in the brokers get deleted within some time from the **Raw zone**. To keep messages longer, we move them into a Landing Zone. This is where the data can be loaded and transformed for later use in the Trusted and Curated Zone.
+
+<figure>
+  <img src="images/streaming_data.jpeg" alt="Streaming Data" width=60% height=60%>
+</figure>
+
+- Glue can load data directly from Kafka or Kinesis.
+- Using Spark Streaming, we can load data from Message Brokers into a Spark DataFrame or Glue DynamicFrame.
+- Kafka can be configured to load data into S3 using a Kafka Connector as a Landing Zone, avoiding the need to connect Glue to Kafka directly.
+
 <hr style="border:2px solid gray">
 
 ## Project: STEDI Human Balance Analytics
