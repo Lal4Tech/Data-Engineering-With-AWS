@@ -23,5 +23,12 @@ In this project,
 
 ### Spark and Data Lakes
 
+[STEDI Human Balance Analytics](3_Spark_and_Data_Lakes/project/README.md)
+
+In this project,
+
+- Use Spark and AWS Glue allow you to process data from multiple sources, categorize the data, and curate it to be queried in the future for multiple purposes.
+- Build a data lakehouse solution for sensor data that trains a machine learning model.
+
 ### Automate Data Pipelines
 
