@@ -80,8 +80,144 @@ Environment and Tools:
 5. Once the worker has finished running the step, the final status of the task is recorded and additional tasks are placed by the scheduler until all tasks are complete.
 6. Once all tasks have been completed, the DAG is complete.
 
+**Exercise**: [Airflow DAGs](exercises/airflow_dags.py)
+
+**Operators**:
+
+- Define the atomic steps of work that make upa DAG
+- common operators:
+  - PythonOperator
+  - PostgresOperator
+  - RedshiftToS3Operator
+  - S3ToRedshiftOperator
+  - BashOperator
+  - SimpleHttpOperator
+  - Sensor
+
+**DAG Decorator**:
+
+- Annotation used to mark a function as the definition of a DAG.
+
+```python
+import pendulum
+import logging
+from airflow.decorators import dag
+
+@dag(description='Analyzes test Data',
+    start_date=pendulum.now(),
+    schedule_interval='@daily')
+def divvy_dag():
+```
+
+**Operators and Tasks**:
+
+- Operators: Define atomic steps of work that make up a DAG.
+- Tasks: Instantiated operators
+
+```python
+from airflow import DAG
+from airflow.operators.python_operator import PythonOperator
+
+def hello_world():
+    print(“Hello World”)
+
+divvy_dag = DAG(...)
+task = PythonOperator(
+    task_id=’hello_world’,
+    python_callable=hello_world,
+    dag=divvy_dag)
+```
+
+Tasks can be defined using ```@task```decorators
+
+```python
+@task()
+    def hello_world_task():
+      logging.info("Hello World")
+```
+
+**Schedules**:
+
+Define with cron strings or Airflow presets.
+
+```@once```, ```@hourly```, ```@daily```, ```@weekly```, ```@monthly```, ```@yearly```, ```None```
+
+**Start Date**: if start date is in the past, DAG will run as many times as there are schedule intervals between that start date and the current date.
+
+**End Date**: Unless an optional end date is specified, DAGs will continue run until it get disabled or deleted.
+
+**Exercise**: [Run the schedules](exercises/run_the_schedules.py)
 
 <hr style="border:2px solid gray">
+
+#### Task Dependencies
+
+In DAGs:
+
+- Nodes = Tasks
+- Edges = Ordering and dependencies between tasks.
+- ```a >> b``` means a comes before b. Similarly```a << b``` means a comes after b.
+- Can also use ```set_downstream``` and ```set_upstream```
+eg:
+
+```python
+hello_world_task = PythonOperator(task_id=’hello_world’, ...)
+goodbye_world_task = PythonOperator(task_id=’goodbye_world’, ...)
+...
+# Use >> to denote that goodbye_world_task depends on hello_world_task
+hello_world_task >> goodbye_world_task
+
+# With set_downstream or set_upstream
+hello_world_task.set_downstream(goodbye_world_task)
+```
+
+**Exercise**: [Task Dependencies](exercises/task_dependencies.py)
+
+#### Airflow Hooks
+
+- Connections can be access in code via hooks.
+- Hooks provide a reusable interface to external systems and databases.
+- Common hooks:
+  - ```HttpHook```
+  - ```PostgresHook```
+  - ```MySqlHook```
+  - ```SlackHook```
+  - ```PrestoHook```
+
+eg:
+
+```python
+from airflow import DAG
+from airflow.hooks.postgres_hook import PostgresHook
+from airflow.operators.python_operator import PythonOperator
+
+def load():
+# Create a PostgresHook option using the `demo` connection
+    db_hook = PostgresHook(‘demo’)
+    df = db_hook.get_pandas_df('SELECT * FROM rides')
+    print(f'Successfully used PostgresHook to return {len(df)} records')
+
+load_task = PythonOperator(task_id=’load’, python_callable=hello_world, ...)
+```
+
+#### Context Variables
+
+**kwargs parameter to accept the runtime variables in task.
+
+```python
+from airflow.decorators import dag, task
+
+@dag(
+  schedule_interval="@daily";
+)
+def template_dag(**kwargs):
+
+  @task
+  def hello_date():
+    print(f"Hello {kwargs['ds']}}")
+```
+
+**Exercise**: [Context Templating](exercises/context_templating.py)
 
 ## Airflow and AWS
 
