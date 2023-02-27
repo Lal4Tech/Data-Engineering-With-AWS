@@ -219,7 +219,66 @@ def template_dag(**kwargs):
 
 **Exercise**: [Context Templating](exercises/context_templating.py)
 
+<hr style="border:2px solid gray">
+
 ## Airflow and AWS
+
+### Create an IAM User in AWS
+
+Permissions:
+
+- AdministratorAccess
+- AmazonRedshiftFullAccess
+- AmazonS3FullAccess
+
+Set and download Download access keys
+
+### Airflow connections
+
+Create connection in Airflow:
+
+- **Connection Id**: Enter ```aws_credentials```.
+- **Connection Type**: Enter ```Amazon Web Services```.
+- **AWS Access Key ID**: Enter your **Access key ID** from the IAM User credentials you downloaded earlier.
+- **AWS Secret Access Key**: Enter your **Secret access key** from the IAM User credentials you downloaded earlier. Once you've entered these values, select **Save**.
+- Click the **Test** button to pre-test your connection information.
+
+**S3 Hook**
+
+```python
+
+
+from airflow.hooks.S3_hook import S3Hook
+. . .
+hook = S3Hook(aws_conn_id='aws_credentials')
+        bucket = Variable.get('s3_bucket')
+        prefix = Variable.get('s3_prefix')
+        logging.info(f"Listing Keys from {bucket}/{prefix}")
+        keys = hook.list_keys(bucket, prefix=prefix)
+        for key in keys:
+            logging.info(f"- s3://{bucket}/{key}")
+    list_keys()
+
+list_keys_dag = list_keys()
+```
+
+### Copy S3 Data
+
+1. Create S3 bucket
+
+```aws s3 mb s3:/`udacity-airflow-bkt/```
+
+2. Copy data from udacity bucket to cloudshell directory:
+
+```aws s3 cp s3://udacity-dend/data-pipelines/ ~/data-pipelines/ --recursive```
+
+3. Copy the data from the home cloudshell directory to our own bucket:
+
+```aws s3 cp ~/data-pipelines/ s3://udacity-airflow-bkt/data-pipelines/ --recursive```
+
+4. List the data to be sure it copied over: 
+
+```aws s3 ls s3://udacity-airflow-bkt/data-pipelines/```
 
 <hr style="border:2px solid gray">
 
