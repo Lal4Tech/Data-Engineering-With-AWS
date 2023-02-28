@@ -265,20 +265,45 @@ list_keys_dag = list_keys()
 ### Copy S3 Data
 
 1. Create S3 bucket
-
 ```aws s3 mb s3:/`udacity-airflow-bkt/```
-
 2. Copy data from udacity bucket to cloudshell directory:
-
 ```aws s3 cp s3://udacity-dend/data-pipelines/ ~/data-pipelines/ --recursive```
-
 3. Copy the data from the home cloudshell directory to our own bucket:
-
 ```aws s3 cp ~/data-pipelines/ s3://udacity-airflow-bkt/data-pipelines/ --recursive```
-
-4. List the data to be sure it copied over: 
-
+4. List the data to be sure it copied over:
 ```aws s3 ls s3://udacity-airflow-bkt/data-pipelines/```
+5. Update bucket name on copy statements on **Exercise**: [SQL Statments](exercises/sql_statements.py)
+
+### Configure Variable
+
+Open the Airflow UI and open Admin->Variables.
+
+Click "Create".
+
+Set ```Key``` equal to ```s3_bucket``` and set ```Value``` equal to bucket name.
+
+Set ```Key``` equal to ```s3_prefix``` and set ```Value``` equal to ```data-pipelines```.
+
+Click save.
+
+Or through command line:
+
+```bash
+airflow variables set s3_bucket udacity-airflow-bkt
+```
+
+```bash
+airflow variables set s3_prefix data-pipelines
+```
+
+Now, we can refer variable like this:
+
+```python
+from airflow.models import Variable
+. . .
+bucket = Variable.get('s3_bucket')
+prefix = Variable.get('s3_prefix')
+```
 
 <hr style="border:2px solid gray">
 
