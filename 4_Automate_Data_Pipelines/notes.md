@@ -243,6 +243,12 @@ Create connection in Airflow:
 - **AWS Secret Access Key**: Enter your **Secret access key** from the IAM User credentials you downloaded earlier. Once you've entered these values, select **Save**.
 - Click the **Test** button to pre-test your connection information.
 
+Command to create aws connection:
+
+```bash
+airflow connections add aws_credentials --conn-uri 'aws://<aws_access_key_id>:<aws_access_key_secret>'
+```
+
 **S3 Hook**
 
 ```python
@@ -304,6 +310,8 @@ from airflow.models import Variable
 bucket = Variable.get('s3_bucket')
 prefix = Variable.get('s3_prefix')
 ```
+
+ **Exercise**: [Connections and Hooks](exercises/connections_hooks.py)
 
 <hr style="border:2px solid gray">
 
