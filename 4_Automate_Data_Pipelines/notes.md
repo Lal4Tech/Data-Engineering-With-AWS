@@ -311,7 +311,145 @@ bucket = Variable.get('s3_bucket')
 prefix = Variable.get('s3_prefix')
 ```
 
- **Exercise**: [Connections and Hooks](exercises/connections_hooks.py)
+**Exercise**: [Connections and Hooks](exercises/connections_hooks.py)
+
+### Configure AWS Redshift Serverless
+
+**AWS Redshift Serverless** gives all the benefits of a Redshift cluster without paying for compute when your servers are idle.
+
+**Grant Redshift access to S3 so it can copy data from CSV files**:
+
+Create a Redshift Role called my-redshift-service-role from the AWS Cloudshell.
+
+```bash
+aws iam create-role --role-name my-redshift-service-role --assume-role-policy-document '{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "redshift.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}'
+```
+
+Grant the role S3 Full Access:
+
+```bash
+aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess --role-name my-redshift-service-role
+```
+
+1. Go to Amazon Redshift > Redshift Serverless
+2. Click Customize settings
+3. Go with the default namespace name
+4. Check the box Customize admin user credentials
+5. Enter awsuser for the Admin user name
+6. Enter a password (save this for later)
+7. Associate the ```my-redshift-service-role``` created with Redshift. This will enable Redshift Serverless to connect with S3
+8. Accept the defaults for Security and encryption
+9. Accept the default Workgroup settings
+10. Select Turn on enhanced VPC routing and click Save
+11. Click Continue and wait for Redshift Serverless setup to finish
+12. After status showing as *Available*, click the default workgroup
+13. To make this cluster publicly accessible in order to connect to this cluster via Airflow:
+    - Click Edit
+    - Select Turn on Publicly accessible > Save
+    - Click on **VPC security group** link to open EC2 console.
+    - Go to Inbound Rules > *Edit inbound rules*.
+    - Add an inbound rule, as shown in the image below.
+      - Type = *Custom TCP*
+      - Port range = *0 - 5500*
+      - Source = *Anywhere-iPv4*
+    - Now the Redshift Serverless should be accessible from Airflow.
+14. Go back to Redshift workgroup and copy the end point.  
+
+### Airflow Connections to AWS Redshift
+
+Create connection by going to to Admin > Connections with following info:
+
+- **Connection Id**: Enter redshift.
+- **Connection Type**: Choose Amazon Redshift.
+- **Host**: Enter the endpoint of your Redshift Serverless workgroup, excluding the port and schema name at the end
+- **Schema**: Enter dev. This is the Redshift database you want to connect to.
+- **Login**: Enter awsuser.
+- **Password**: Enter the password created when launching Redshift serverless.
+- **Port**: Enter 5439. Once you've entered these values, select Save.
+
+or with command, eg:
+
+```bash
+airflow connections add redshift --conn-uri 'redshift://awsuser:R3dsh1ft@default.859321506295.us-east-1.redshift-serverless.amazonaws.com:`439/dev'
+```
+
+### PostgresHook and Postgres Operator
+
+Python class ```MetastoreBackend```connects to the Airflow Metastore Backend to retrieve credentials and other data required to connect to outside systems.
+
+Usage:
+
+```python
+from airflow.decorators import dag
+from airflow.secrets.metastore import MetastoreBackend
+
+
+@dag(
+    start_date=pendulum.now()
+)
+def load_data_to_redshift_dag():
+
+    @task
+    def copy_task():    
+        metastoreBackend = MetastoreBackend()
+        aws_connection=metastoreBackend.get_connection("aws_credentials")
+        # aws_connection.login contains Access key ID
+        # aws_connection.password contains secret access key
+        logging.info(vars(aws_connection))
+```
+
+```PostgresHook```: superclass of the Airflow ```DbApiHook```. It can be used to get all the connection details for the postgres database using connection id.
+
+```python
+from airflow.providers.postgres.operators.postgres import PostgresOperator
+. . .
+redshift_hook = PostgresHook("redshift")
+
+redhisft_hook.run("SELECT * FROM trips")
+```
+
+**PostgresOperator**:
+
+```python
+from airflow.hooks.postgres_hook import PostgresHook
+from airflow.decorators import dag
+
+@dag(
+    start_date=pendulum.now()
+)
+def load_data_to_redshift_dag():
+
+
+. . .
+    create_table_task=PostgresOperator(
+        task_id="create_table",
+        postgres_conn_id="redshift",
+        sql=sql_statements.CREATE_TRIPS_TABLE_SQL
+    )
+. . .
+    create_table_task >> copy_data
+```
+
+### Build the S3 to Redshift DAG
+
+**Exercise**: [S3 to Redshift](exercises/s3_to_redshift.py)
+
+### Putting all together
+
+<figure>
+  <img src="images/airflow_aws_all_together.jpeg" alt="Airflow and AWS Putting all together" width=60% height=60%>
+</figure>
 
 <hr style="border:2px solid gray">
 
