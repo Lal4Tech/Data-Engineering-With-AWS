@@ -32,3 +32,9 @@ In this project,
 
 ### Automate Data Pipelines
 
+[Data Pipelines with Airflow](4_Automate_Data_Pipelines/project/README.md)
+
+In this project,
+
+- Using Airflow to create high grade data pipelines that are dynamic and built from reusable tasks, can be monitored, and allow easy backfills.
+- Create custom operators to perform tasks such as staging the data, filling the data warehouse, and running checks on the data as the final step.

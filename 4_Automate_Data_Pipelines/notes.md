@@ -448,17 +448,311 @@ def load_data_to_redshift_dag():
 ### Putting all together
 
 <figure>
-  <img src="images/airflow_aws_all_together.jpeg" alt="Airflow and AWS Putting all together" width=60% height=60%>
+  <img src="images/airflow_aws_all_together.png" alt="Airflow and AWS Putting all together" width=60% height=60%>
 </figure>
 
 <hr style="border:2px solid gray">
 
 ## Data Quality
 
+### Data Lineage
+
+The data lineage of a dataset describes the discrete steps involved in the creation, movement, and calculation of that dataset.
+
+Why data lineage is important:
+
+- **Build Confidence**: being able to describe the data lineage of a particular dataset or analysis will build confidence in data consumers.
+- **Defining Metrics**: it allows everyone in the organization to agree on the definition of how a particular metric is calculated.
+- **Debugging**: helps data engineers track down the root of errors when they occur.
+
+**Visualizing Data Lineage**:
+
+<figure>
+  <img src="images/bikeshare_data_lineage.jpeg" alt="Bikeshare Data Lineage" width=60% height=60%>
+</figure>
+
+Airflow DAGs are a natural representation for the movement & transformation of data.
+
+<figure>
+  <img src="images/airflow_data_lineage.jpeg" alt="Airflow Data Lineage" width=60% height=60%>
+</figure>
+
+- Airflow keeps a record of historical DAG and task executions.
+- It does not store the code from those historical runs.
+- Whatever the latest code is in your DAG definition is what Airflow will render for you in the browser.
+
+**Exercise**: [Data Lineage](exercises/data_lineage.py)
+
+### Data Pipeline Schedules
+
+**Data in Time Ranges**:
+
+When a data pipeline is designed with a schedule in mind, we can use the execution time of the pipeline run to only analyze data from the time period since this data pipeline last ran.
+
+**Analyzing an Entire Dataset**:
+
+In a naive analysis, with no scope, we would analyze all of the data at all times.
+
+**Schedules**:
+
+Pipelines are often driven by schedules which determine what data should be analyzed and when.
+
+- Pipeline schedules can reduce the amount of data that needs to be processed in a given run.
+- Using schedules to select only data relevant to the time period of the given pipeline execution can help improve the quality and accuracy of the analyses performed by our pipeline.
+- Running pipelines on a schedule will decrease the time it takes the pipeline to run.
+
+**Selecting the time period**:
+
+Factors to be considered in determining the appropriate time period for a schedule:
+
+- What is the size of data, on average, for a time period?
+- How frequently is data arriving, and how often does the analysis need to be performed?
+- What's the frequency on related datasets? 
+
 <hr style="border:2px solid gray">
+
+### Scheduling in Airflow
+
+Airflow will **catchup** by creating a DAG run for every period defined by the *schedule_interval* between the *start_date* and *now*.
+
+<figure>
+  <img src="images/scheduling_in_airflow.jpeg" alt="Scheduling in airflow" width=60% height=60%>
+</figure>
+
+**catchup**:
+
+- Airflow uses the schedule interval to create historical DAG runs and catchup data.
+- Whenever the start date of a DAG is in the past, and the time difference between the start date and now includes more than one schedule intervals, Airflow will automatically schedule and execute a DAG run to satisfy each one of those intervals.
+- Catchup is enabled by default.
+
+**Start Date**:
+
+- Airflow will begin running pipelines on the date in the ```start_date``` parameter.
+- This is the date when a scheduled DAG will start executing on its own.
+
+```python
+@dag(
+    # schedule to run daily
+    # once it is enabled in Airflow
+    schedule_interval='@daily',
+    start_date=pendulum.now(),
+    catchup=False
+)
+```
+
+**End Date**:
+
+- Can use an end_date parameter to let Airflow know the date it should stop running a scheduled pipeline.
+- End_dates can also be useful when you want to perform an overhaul or redesign of an existing pipeline. Update the old pipeline with an ``end_date``` and then have the new pipeline start on the end date of the old pipeline.
+
+```python
+@dag(
+    start_date=pendulum.datetime(2022, 8, 1, 0, 0, 0, 0),
+    end_date=pendulum.datetime(2022, 9, 1, 0, 0, 0, 0),
+    schedule_interval='@daily',
+    max_active_runs=1    
+)
+```
+
+**Exercise**: [Schedules and Catchups in Airflow](exercises/data_lineage.py)
+
+### Data Partitioning
+
+- **Schedule partitioning**: Apart from reducing the amount of data our pipelines have to process, schedules also help us guarantee that we can meet timing guarantees that our data consumers required.
+- **Logical partitioning**: Conceptually related data can be partitioned into discrete segments and processed separately.
+- **Size Partitioning**: separates data for processing based on desired or required storage limits.
+
+**Goals of Data Partitioning**:
+
+- Pipelines designed to work with partitioned data fail more gracefully.
+  - Smaller datasets, smaller time periods, and related concepts are easier to debug than big datasets, large time periods, and unrelated concepts.
+  - Partitioning makes debugging and rerunning failed tasks much simpler.
+  - Enables easier redos of work, reducing cost and time.
+- If data is partitioned appropriately, there will be fewer dependencies on each other. Because of this, Airflow will be able to parallelize execution of your DAGs to produce your results even faster.
+
+**Exercise**: [Data Partitioning](exercises/data_partitioning.py)
+
+### Data Quality Requirements
+
+**Data Quality** is the measure of how well a dataset satisfies its intended use.
+
+- Adherence to a set of requirements is a good starting point for measuring data quality.
+
+**Examples of Data Quality Requirements**:
+
+- Data must be a certain size
+- Data must be accurate to some margin of error
+- Data must arrive within a given timeframe from the start of execution. Use SLA in Airflow
+- Pipelines must run on a particular schedule
+- Data must not contain any sensitive information
+
+**Exercise**: [Data Quality](exercises/data_quality.py)
 
 ## Production Data Pipelines
 
+### Extending Airflow Plugins & Contrib
+
+Custom **Hooks** allow Airflow to integrate with non-standard datastores and systems.
+
+[Airflow Contrib](https://github.com/apache/airflow/tree/main/airflow/contrib): to check existing Airflow plugins and contribute.
+
+Custom Operators are typically used to capture frequently used operations into a reusable form.
+
+The most common types of user-created plugins for Airflow are Operators and Hooks.
+
+To create custom operator, follow the steps:
+
+1. Identify Operators that perform similar functions and can be consolidated
+2. Define a new Operator in the plugins folder
+3. Replace the original Operators with your new custom one, re-parameterize, and instantiate them.
+
+Official doc: [Creating a custom operator](https://airflow.apache.org/docs/apache-airflow/stable/howto/custom-operator.html)
+
+**Exercise**: [Custom Operators](exercises/custom_operators.py)
+
+### Best Practices for Data Pipeline Steps - Task Boundaries
+
+DAG tasks should be designed such that they are:
+
+- Atomic and have a single purpose
+- Maximize parallelism
+- Make failure states obvious
+
+Every task in the dag should perform only one job.
+
+Helps to understand the flow easily. Also, can be easily parallelized to improve execution speed.
+
+**Exercise**: [Refactor DAG](exercises/refactor_dag.py)
+
+### Converting an Airflow 1 DAG
+
+The main difference between Airflow 1 and Airflow 2 syntax is the functional paradigm, and the use of Decorators for Tasks and DAGs.
+
+Key Differences:
+
+- Airflow1 instantiates the DAG directly with dag= DAG (...) whereas, with Airflow2, you'll use a decorator.
+- Airflow1 uses explicitly stated DAG names, but Airflow2 can infer DAG names from functions.
+- Airflow1 uses PythonOperator() in tasks, but in Airflow2, you'll use a regular Python function with the task decorator.
+- In Airflow2, you don't instantiate the DAG, so you don't have to pass the DAG.
+
+**Airflow 1**:
+
+```python
+dag = DAG(
+    'data_quality_legacy',
+    start_date=pendulum.datetime(2018, 1, 1, 0, 0, 0, 0),
+    end_date=pendulum.datetime(2018, 12, 1, 0, 0, 0, 0),
+    schedule_interval='@monthly',
+    max_active_runs=1
+)
+
+def load_trip_data_to_redshift(*args,* *kwargs):
+    metastoreBackend = MetastoreBackend()
+    aws_connection=metastoreBackend.get_connection("aws_credentials")
+    redshift_hook = PostgresHook("redshift")
+    execution_date = kwargs["execution_date"]
+    sql_stmt = sql_statements.COPY_MONTHLY_TRIPS_SQL.format(
+        aws_connection.login,
+        aws_connection.password,
+        year=execution_date.year,
+        month=execution_date.month
+    )
+    redshift_hook.run(sql_stmt)
+
+load_trips_task = PythonOperator(
+    task_id='load_trips_from_s3_to_redshift',
+    dag=dag,
+    python_callable=load_trip_data_to_redshift,
+    provide_context=True,
+    sla=datetime.timedelta(hours=1)
+)
+
+. . .
+
+create_trips_table >> load_trips_task
+```
+
+**Airflow 2**:
+
+```python
+@dag(
+    start_date=pendulum.datetime(2018, 1, 1, 0, 0, 0, 0),
+    end_date=pendulum.datetime(2018, 12, 1, 0, 0, 0, 0),
+    schedule_interval='@monthly',
+    max_active_runs=1    
+)
+def data_quality():
+
+    @task(sla=datetime.timedelta(hours=1))
+    def load_trip_data_to_redshift(*args,* *kwargs):
+        metastoreBackend = MetastoreBackend()
+        aws_connection=metastoreBackend.get_connection("aws_credentials")
+        redshift_hook = PostgresHook("redshift")
+        execution_date = kwargs["execution_date"]
+        sql_stmt = sql_statements.COPY_MONTHLY_TRIPS_SQL.format(
+            aws_connection.login,
+            aws_connection.password,
+            year=execution_date.year,
+            month=execution_date.month
+        )
+        redshift_hook.run(sql_stmt)
+
+    load_trips_task = load_trip_data_to_redshift()
+    
+. . .
+
+create_trips_table >> load_trips_task
+```
+
+**Exercise**: [Convert Airflow 1 to 2](exercises/convert_airflow1.py)
+
+### Monitoring
+
+**Service Level Agreements**:
+
+DAGs can be configured to have an SLA which is defined as a time by which a DAG must com.
+
+**Emails and Alerts**:
+
+Airflow can be configured to send emails on DAG and task state changes.
+
+**Metrics**:
+
+- Airflow can be configured to publish metrics to *Statsd* and *Prometheus*.
+- *Statsd* and *Prometheus* can be used together to view Airflow system metrics as well as trigger alerts for outages and failures.
+
+
+**Logging**:
+
+- By default, Airflow logs to the local file system.
+- Logs can be forwarded using standard logging tools like *fluentd*.
+
+### Building a full pipeline
+
+**Exercise**: [Bulding full DAG](exercises/build_full_dag.py)
+
+### Putting all together
+
+Airflow has robbest ecosystem for logging, monitoring, and metrics.
+
+<figure>
+  <img src="images/airflow_instrumentation.png" alt="Airflow Instrumentation" width=60% height=60%>
+</figure>
+
+### Data Pipeline Orchestrators
+
+Other Pipeline Orchestrators: [Pipeline frameworks & libraries](https://github.com/pditommaso/awesome-pipeline)
+
+[Luigi vs Airflow](https://medium.com/@cyrusv/luigi-vs-airflow-vs-zope-wfmc-comparison-of-open-source-workflow-engines-de5209e6dac1)
+
 <hr style="border:2px solid gray">
 
-## Project: Data Pipelines
+## Project: Data Pipelines with Airflow
+
+A music streaming company, Sparkify, has decided that it is time to introduce more automation and monitoring to their data warehouse ETL pipelines and come to the conclusion that the best tool to achieve this is Apache Airflow.
+
+They have decided to bring you into the project and expect you to create high grade data pipelines that are dynamic and built from reusable tasks, can be monitored, and allow easy backfills. They have also noted that the data quality plays a big part when analyses are executed on top the data warehouse and want to run tests against their datasets after the ETL steps have been executed to catch any discrepancies in the datasets.
+
+The source data resides in S3 and needs to be processed in Sparkify's data warehouse in Amazon Redshift. The source datasets consist of JSON logs that tell about user activity in the application and JSON metadata about the songs the users listen to.
+
+[Data Pipelines with Airflow](4_Automate_Data_Pipelines/project/README.md)
