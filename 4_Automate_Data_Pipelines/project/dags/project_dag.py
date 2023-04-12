@@ -4,10 +4,10 @@ from datetime import datetime, timedelta
 from airflow.decorators import dag
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.postgres_operator import PostgresOperator
-from plugins.operators.stage_redshift import StageToRedshiftOperator
-from plugins.operators.load_fact import LoadFactOperator
-from plugins.operators.load_dimension import LoadDimensionOperator
-from plugins.operators.data_quality import DataQualityOperator
+from operators.stage_redshift import StageToRedshiftOperator
+from operators.load_fact import LoadFactOperator
+from operators.load_dimension import LoadDimensionOperator
+from operators.data_quality import DataQualityOperator
 from common.sql_statements import SqlQueries
 
 start_date = datetime(2018, 11, 1)
