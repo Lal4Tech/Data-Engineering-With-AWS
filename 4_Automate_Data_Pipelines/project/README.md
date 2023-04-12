@@ -19,12 +19,6 @@ The source data resides in S3 and needs to be processed in Sparkify's data wareh
 
 Create custom operators to perform tasks such as staging the data, filling the data warehouse, and running checks on the data as the final step.
 
-**Sample DAG**:
-
-<figure>
-  <img src="images/project_dag_sample.png" alt="Sample DAG for project" width=60% height=60%>
-</figure>
-
 ## Implementation
 
 ### Copy S3 Data
@@ -55,3 +49,25 @@ aws s3 cp ~/song-data/ s3://uc-de-airflow-aws/song-data/ --recursive
 aws s3 ls s3://uc-de-airflow-aws/log-data/
 aws s3 ls s3://uc-de-airflow-aws/song-data/
 ```
+
+### Airflow DAG
+
+<figure>
+  <img src="images/airflow_project_dag.png" alt="DAG for project" width=60% height=60%>
+</figure>
+
+**Operators**:
+
+- ```Begin_execution``` and ```End_executiom```: Dummy operators represents starting and end of DAG.
+- ```Create_tables```: create required database tables.
+- ```Stage_events``` and ```Stage_songs```:  extract data from S3 to Redshift staging tables.
+- ```Load_songplays_fact_table```: load data from staging tables to fact table.
+- ```Load_user_dim_table```, ```Load_song_dim_table```, ```Load_artist_dim_table``` and ```Load_time_dim_table```: load data from staging tables to dimension tables.
+- ```Run_data_quality_checks```: operator to run data quality checks.
+
+## Execution
+
+1. Create S3 Bucket and copy data from source.
+2. Add AWS connection info in Airflow via UI
+3. Create Redshift serverless and connection information and store it in Airflow via UI
+4. Run project DAG and monitor the execution via Airflow UI.
